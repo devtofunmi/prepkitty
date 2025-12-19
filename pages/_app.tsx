@@ -6,6 +6,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import { Analytics } from "@vercel/analytics/react";
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   useEffect(() => {
@@ -19,6 +20,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
     <main className={`${GeistSans.className} ${GeistMono.variable}`}>
       <SessionProvider session={session}>
         <Component {...pageProps} />
+        <Analytics />
       </SessionProvider>
     </main>
   );
