@@ -10,10 +10,10 @@ export const Hero = () => {
         <span className="inline-flex items-center px-4 py-1 mb-6 md:text-base text-sm rounded-full border border-blue-200 bg-blue-50 text-blue-400 font-semibold">
           Career management & job readiness
         </span>
-                  <h1 className="text-4xl md:text-6xl font-extrabold mb-6 text-gray-900">
-                    Ace Your Next Interview and Land Your Dream Job in <span className="text-blue-400">Nigeria.</span>
-                  </h1>        <p className="max-w-xl text-gray-600 mb-8 md:text-xl text-lg mx-auto md:mx-0 font-normal">
-          PrepKitty helps you practice for job interviews in Nigeria&apos;s top industries. Get instant feedback and improve your skills.
+        <h1 className="text-4xl md:text-6xl font-extrabold mb-6 text-gray-900">
+          Ace Your Next Interview and Land Your Dream Job <span className="text-blue-400">Anywhere.</span>
+        </h1>        <p className="max-w-xl text-gray-600 mb-8 md:text-xl text-lg mx-auto md:mx-0 font-normal">
+          PrepKitty helps you practice for job interviews in top industries. Get instant feedback and improve your skills.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-center md:justify-start mb-10">
           <Link href="/signup">
@@ -23,22 +23,22 @@ export const Hero = () => {
           </Link>
         </div>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 text-gray-500 text-base justify-center md:justify-start">
-          {/* <span className="flex items-center justify-center md:justify-start font-medium">
-            <CheckCircle size={16} className="text-blue-400 mr-2"/> Trusted by Professionals in Lagos, Abuja, and Port Harcourt.
-          </span> */}
           <span className="flex items-center justify-center md:justify-start font-medium">
-            <CheckCircle size={16} className="text-blue-400 mr-2"/> Advanced Model
+            <CheckCircle size={16} className="text-blue-400 mr-2" /> Trusted by Professionals Worldwide.
+          </span>
+          <span className="flex items-center justify-center md:justify-start font-medium">
+            <CheckCircle size={16} className="text-blue-400 mr-2" /> Advanced Model
           </span>
         </div>
       </div>
       <div className="w-full md:w-1/2 mt-12 md:mt-0 flex justify-center">
-        <Image 
-          src={"/hero.jpg"} 
-          alt="AI Interview Practice App Interface" 
-          width={500} 
-          height={500} 
+        <Image
+          src={"/hero.jpg"}
+          alt="AI Interview Practice App Interface"
+          width={500}
+          height={500}
           className="rounded-xl  border border-gray-100"
-          unoptimized 
+          unoptimized
         />
       </div>
     </section>

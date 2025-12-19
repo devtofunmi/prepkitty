@@ -6,38 +6,38 @@ import { ChevronLeft, ChevronRight, User } from "lucide-react";
 const testimonials = [
   {
     image: "https://randomuser.me/api/portraits/men/44.jpg",
-    name: "Adewale Adebayo",
-    title: "Graduate Trainee, Access Bank",
+    name: "Alex Johnson",
+    title: "Software Engineer, Tech Solutions",
     quote: "Prepkitty was a lifesaver during my job search. The AI mock interviews felt so real, and the feedback helped me correct my mistakes. I finally landed my dream job!",
   },
   {
     image: "https://randomuser.me/api/portraits/women/32.jpg",
-    name: "Ngozi Okafor",
-    title: "Customer Service Rep, MTN",
+    name: "Sarah Miller",
+    title: "Marketing Lead, Global Retail",
     quote: "I used to be so nervous about interviews, but Prepkitty helped me build my confidence. The voice chat feature is amazing for practicing your communication skills.",
   },
   {
     image: "https://randomuser.me/api/portraits/men/65.jpg",
-    name: "Chinedu Okonkwo",
-    title: "Project Manager, Dangote Group",
+    name: "David Chen",
+    title: "Project Manager, BlueRidge Group",
     quote: "The AI interviewer is very sharp. It asked me some tough questions that really made me think. This is a fantastic tool for anyone serious about their career.",
   },
   {
     image: "https://randomuser.me/api/portraits/women/68.jpg",
-    name: "Aisha Bello",
-    title: "NYSC Corper",
-    quote: "As a fresh graduate, I was worried about my first real interview. Prepkitty made it so easy to practice and get ready. I feel much more prepared for the job market.",
+    name: "Elena Rodriguez",
+    title: "Human Resources Specialist",
+    quote: "As a career coach, I often recommend Prepkitty to my clients. It makes it so easy to practice and get ready. I've seen a real difference in their confidence levels.",
   },
   {
     image: "https://randomuser.me/api/portraits/women/55.jpg",
-    name: "Funke Adekunle",
-    title: "Digital Marketer, Jumia",
-    quote: "The UI is clean and easy to use. I love that I can practice anytime, anywhere. Prepkitty is a must-have for any young professional in Nigeria.",
+    name: "Lisa Wang",
+    title: "Product Designer, Innovate Lab",
+    quote: "The UI is clean and easy to use. I love that I can practice anytime, anywhere. Prepkitty is a must-have for any working professional.",
   },
   {
     image: "https://randomuser.me/api/portraits/men/20.jpg",
-    name: "Emeka Nwosu",
-    title: "Software Developer, Andela",
+    name: "James Wilson",
+    title: "Full-Stack Developer, Streamline Systems",
     quote: "This is the best interview prep tool I've used. The progress tracking is very useful, and the AI is surprisingly good at asking relevant technical questions.",
   }
 ];
@@ -77,7 +77,7 @@ export const Testimonials = () => {
       </p>
 
       <div className="relative flex items-center">
-        <button 
+        <button
           onClick={prevTestimonial}
           aria-label="Previous testimonial"
           className="z-10 p-2 text-gray-700 bg-white rounded-full shadow-md hover:bg-gray-100 absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 sm:translate-x-0 sm:static sm:mr-4"
@@ -99,16 +99,16 @@ export const Testimonials = () => {
                   <div className="flex items-center mb-4">
                     <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3 overflow-hidden">
                       {testimonial.image ? (
-                          <Image
-                              src={testimonial.image}
-                              alt={testimonial.name}
-                              width={40}
-                              height={40}
-                              className="object-cover"
-                              unoptimized
-                          />
+                        <Image
+                          src={testimonial.image}
+                          alt={testimonial.name}
+                          width={40}
+                          height={40}
+                          className="object-cover"
+                          unoptimized
+                        />
                       ) : (
-                          <User size={20} className="text-gray-500" />
+                        <User size={20} className="text-gray-500" />
                       )}
                     </div>
                     <div>
@@ -125,7 +125,7 @@ export const Testimonials = () => {
           </div>
         </div>
 
-        <button 
+        <button
           onClick={nextTestimonial}
           aria-label="Next testimonial"
           className="z-10 p-2 text-gray-700 bg-white rounded-full shadow-md hover:bg-gray-100 absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 sm:translate-x-0 sm:static sm:ml-4"

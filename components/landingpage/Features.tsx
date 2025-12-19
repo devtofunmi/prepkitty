@@ -44,7 +44,7 @@ export const Features = () => {
       <div className="grid md:grid-cols-2 gap-8 mt-12">
         <div className="p-8 rounded-xl bg-blue-400 text-white flex flex-col justify-between min-h-[450px]">
           <p className="text-xl font-semibold mb-6">For your realistic practice and in-depth analysis of your performance, anytime.</p>
-          
+
           <div className="flex flex-col gap-6">
             <div className="bg-white/10 p-4 rounded-lg flex items-start">
               <Mic size={24} className="text-white mt-1 mr-4 shrink-0" />
@@ -64,7 +64,7 @@ export const Features = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="p-8 bg-gray-50 rounded-xl border border-gray-200 flex flex-col justify-between min-h-[450px]">
           <div className="p-2 rounded-full bg-gray-200 w-fit">
             <CheckCircle size={20} className="text-gray-700" />
@@ -91,28 +91,28 @@ export const Features = () => {
               <h4 className="text-lg font-semibold mb-3">Sample interview prompts</h4>
               <ul className="text-sm text-gray-700 space-y-2">
                 <li>
-                  <strong>Banks:</strong> &quot;Explain how KYC and BVN processes work in line with CBN policies.&quot;
+                  <strong>Banks:</strong> &quot;Explain how KYC and AML processes work in line with international financial regulations.&quot;
                 </li>
                 <li>
-                  <strong>Telecoms:</strong> &quot;Describe a GSM network handover and steps to troubleshoot frequent dropped calls on the MTN network.&quot;
+                  <strong>Telecoms:</strong> &quot;Describe a network handover process and steps to troubleshoot frequent dropped calls on a mobile network.&quot;
                 </li>
                 <li>
-                  <strong>Fintech/Payments:</strong> &quot;How would you design a secure payment flow for inter-bank transfers and USSD payments in Nigeria?&quot;
+                  <strong>Fintech/Payments:</strong> &quot;How would you design a secure payment flow for cross-border transfers and mobile wallet integrations?&quot;
                 </li>
                 <li>
-                  <strong>Oil &amp; Gas / Energy:</strong> &quot;Explain basic HSE (Health, Safety & Environment) considerations on site.&quot;
+                  <strong>Oil &amp; Gas / Energy:</strong> &quot;Explain basic HSE (Health, Safety & Environment) considerations for offshore operations.&quot;
                 </li>
                 <li>
-                  <strong>Product / PM roles:</strong> &quot;How would you prioritize features for a payment app used across multiple regions?&quot;
+                  <strong>Product / PM roles:</strong> &quot;How would you prioritize features for a global product being launched across multiple markets?&quot;
                 </li>
                 <li>
-                  <strong>Agriculture:</strong> &quot;Discuss the major challenges and opportunities in the Nigerian agricultural sector.&quot;
+                  <strong>Agriculture:</strong> &quot;Discuss the major challenges and opportunities in precision farming and sustainable agriculture.&quot;
                 </li>
                 <li>
-                  <strong>Nollywood:</strong> &quot;As a production manager, how would you handle the logistics of a film shoot in Lagos?&quot;
+                  <strong>Entertainment:</strong> &quot;As a production manager, how would you handle the logistics of a large-scale film shoot in a metropolitan area?&quot;
                 </li>
                 <li>
-                  <strong>E-commerce:</strong> &quot;What strategies would you use to increase customer trust in online shopping in Nigeria?&quot;
+                  <strong>E-commerce:</strong> &quot;What strategies would you use to increase customer trust and conversion in global online shopping platforms?&quot;
                 </li>
               </ul>
             </div>
