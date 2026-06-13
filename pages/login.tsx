@@ -1,11 +1,13 @@
+
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { signIn, getSession } from 'next-auth/react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff, CheckCircle2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -25,13 +27,6 @@ export default function LoginPage() {
     }
   }, [router.query]);
 
-  useEffect(() => {
-    const { message } = router.query;
-    if (message) {
-      toast.info(message as string);
-    }
-  }, [router.query]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsCredentialsLoading(true);
@@ -46,7 +41,7 @@ export default function LoginPage() {
       if (result.error === 'CredentialsSignin') {
         toast.error('Invalid credentials');
       } else if (result.error === 'EmailNotVerified') {
-        toast.error('Your email is not verified. Please check your inbox for the verification link.');
+        toast.error('Your email is not verified.');
       } else {
         toast.error(result.error);
       }
@@ -63,71 +58,130 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center font-sans bg-white text-gray-900 p-4">
+    <div className="h-screen flex font-sans bg-white overflow-hidden">
       <Head>
-        <title>Login - Prepkitty</title>
+        <title>Login - PrepKitty</title>
       </Head>
 
-      <div className="w-full max-w-[400px]">
-        <h2 className="text-3xl font-bold text-center mb-6">
-          Welcome Back
-        </h2>
+      {/* LEFT SIDE: FIXED PREPKITTY BRAND */}
+      <div className="hidden lg:flex w-[40%] bg-black relative flex-col justify-between p-20 text-white border-r border-white/5 h-full shrink-0">
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-600/20 blur-[120px] rounded-full translate-y-1/2 -translate-x-1/2" />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <input
-              type="email"
-              id="email"
-              className="w-full px-3 py-3 rounded-full bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-center"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+        <div className="relative z-10">
+          <Link href="/"><Image src="/prepkitty_logo.png" alt="PrepKitty" width={180} height={50} /></Link>
+        </div>
+
+        <div className="relative z-10">
+          <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-[0.85] mb-12">
+            Mastering your <br />
+            <span className="text-blue-500 italic underline decoration-blue-500/30 underline-offset-8">career.</span>
+          </h1>
+
+          <div className="space-y-10">
+            {[
+              { title: "Voice Practice", desc: "Speak naturally, get analyzed instantly." },
+              { title: "Deep Insights", desc: "Detailed technical feedback for every role." }
+            ].map((item, i) => (
+              <div key={i} className="flex gap-5 items-start">
+                <div className="w-10 h-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                  <CheckCircle2 size={18} />
+                </div>
+                <div>
+                  <h4 className="font-black text-lg mb-1">{item.title}</h4>
+                  <p className="text-slate-500 text-sm">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
+        </div>
 
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              className="w-full px-3 py-3 rounded-full bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-center pr-10"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-3.5 text-gray-500 hover:text-gray-700"
-              aria-label="Toggle password visibility"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isCredentialsLoading}
-            className="w-full px-4 py-3 rounded-full bg-blue-400 hover:bg-blue-500 text-white font-medium disabled:opacity-50 disabled:pointer-events-none"
-          >
-            {isCredentialsLoading ? (
-              <Loader2 className="animate-spin mx-auto text-white" />
-            ) : (
-              'Login'
-            )}
-          </button>
-        </form>
-
-        <p className="text-center flex justify-center gap-1 text-gray-500 mt-6">
-          <p>Don&apos;t have an account?</p>
-          <Link href="/signup" className="text-blue-400 hover:underline focus:outline-none">
-            Sign Up
-          </Link>
-        </p>
+        <div className="relative z-10" />
       </div>
 
-      <ToastContainer />
+      {/* RIGHT SIDE: SCROLLABLE PREPKITTY FORM */}
+      <div className="flex-1 bg-slate-50 lg:bg-white overflow-y-auto relative h-full">
+        <div className="min-h-full flex items-center justify-center p-8 md:p-20">
+          <div className="w-full max-w-[440px] relative z-10">
+            <div className="mb-16">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-8 h-px bg-slate-200" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Login</span>
+              </div>
+              <h2 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tighter mb-4 leading-tight">
+                Welcome <br />
+                <span className="italic text-blue-600 underline decoration-blue-200 underline-offset-4">Back.</span>
+              </h2>
+              <p className="text-slate-500 font-medium italic">Sign in to resume your constant practice.</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-3">
+                <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Email</label>
+                <input
+                  type="email"
+                  className="w-full px-8 py-5 rounded-[2rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 font-medium transition-all text-lg"
+                  placeholder="name@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex justify-between items-center px-1">
+                   <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Password</label>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    className="w-full px-8 py-5 rounded-[2rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 font-medium pr-16 transition-all text-lg"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-6">
+                <button
+                  type="submit"
+                  disabled={isCredentialsLoading}
+                  className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-[2rem] transition-all shadow-2xl shadow-blue-600/20 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-4 text-xl group"
+                >
+                  {isCredentialsLoading ? (
+                    <Loader2 className="animate-spin mx-auto" />
+                  ) : (
+                    <>Log in <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" /></>
+                  )}
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-16 pt-8 border-t border-slate-100 flex items-center justify-between">
+              <p className="text-slate-400 text-sm font-medium italic">New to PrepKitty?</p>
+              <Link href="/signup" className="text-blue-600 font-black text-sm uppercase tracking-widest hover:underline underline-offset-4">
+                Create Account
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Back Arrow for Mobile/Tablet */}
+        <Link href="/" className="absolute top-12 left-12 lg:hidden flex items-center gap-2 text-slate-400">
+          <ArrowRight size={20} className="rotate-180" />
+        </Link>
+      </div>
+
+      <ToastContainer position="bottom-center" />
     </div>
   );
 }
