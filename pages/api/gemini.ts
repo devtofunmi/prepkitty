@@ -8,7 +8,7 @@ if (!API_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY as string);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -104,10 +104,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    console.log('Raw Gemini API response (quiz mode):', text);
     res.status(200).json({ response: text });
-  } catch (error) {
-    console.error('Error calling Gemini API:', JSON.stringify(error, null, 2));
-    res.status(500).json({ message: 'Error generating content from AI.' });
+  } catch (error: any) {
+    console.error('GENIMI API ERROR DETAILS:', error);
+    const status = error.status || 500;
+    const message = error.message || 'Error generating content from AI.';
+    res.status(status).json({ message, details: error });
   }
 }
