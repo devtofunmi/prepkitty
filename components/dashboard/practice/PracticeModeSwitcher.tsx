@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { MessageSquare, HelpCircle } from 'lucide-react';
+
+import React, { useMemo } from 'react';
+import { BrainCircuit, MessageSquare } from 'lucide-react';
 
 interface PracticeModeSwitcherProps {
   practiceMode: string;
@@ -8,50 +8,28 @@ interface PracticeModeSwitcherProps {
 }
 
 const PracticeModeSwitcher: React.FC<PracticeModeSwitcherProps> = ({ practiceMode, setPracticeMode }) => {
-  const [activeTab, setActiveTab] = useState(practiceMode);
-  const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
-
-  useEffect(() => {
-    setActiveTab(practiceMode);
-  }, [practiceMode]);
-
   const tabs = useMemo(
     () => [
-      { id: 'chat', name: 'Chat Mode', icon: MessageSquare },
-      { id: 'quiz', name: 'Quiz Mode', icon: HelpCircle },
+      { id: 'chat', name: 'Interview', icon: MessageSquare },
+      { id: 'quiz', name: 'Quiz', icon: BrainCircuit },
     ],
     []
   );
 
   return (
-    <div className="flex justify-center mb-8">
-      <div className="relative flex rounded-full border border-gray-200 p-1">
-        {/* Sliding highlight */}
-        {tabRefs.current[activeTab] && (
-          <motion.div
-            layout
-            className="absolute bg-blue-400 rounded-full top-1 bottom-1 z-0"
-            initial={false}
-            animate={{
-              left: tabRefs.current[activeTab]?.offsetLeft,
-              width: tabRefs.current[activeTab]?.offsetWidth,
-            }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          />
-        )}
-
+    <div className="flex justify-center md:justify-end">
+      <div className="grid w-full max-w-md grid-cols-2 gap-3">
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            ref={(el) => {
-              tabRefs.current[tab.id] = el ?? null;
-            }}
-            className={`relative z-10 px-6 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors duration-200 ${
-              activeTab === tab.id ? 'text-white' : 'text-gray-600 hover:text-gray-900'
+            className={`flex items-center justify-center gap-3 rounded-[1.5rem] border px-5 py-4 text-sm font-black transition-all active:scale-95 ${
+              practiceMode === tab.id
+                ? 'border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                : 'border-slate-100 bg-white text-slate-500 hover:border-blue-100 hover:text-slate-900'
             }`}
             onClick={() => setPracticeMode(tab.id)}
           >
-            <tab.icon size={16} /> {tab.name}
+            <tab.icon size={18} /> {tab.name}
           </button>
         ))}
       </div>
