@@ -1,12 +1,14 @@
+
 import Head from "next/head";
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowRight, Trophy, Clock, Target } from 'lucide-react';
 import Layout from '../components/dashboard/Layout';
 import Link from 'next/link';
 import DashboardAnalytics from '@/components/dashboard/DashboardAnalytics';
+import { motion } from 'framer-motion';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -59,7 +61,7 @@ export default function Dashboard() {
   if (status === 'loading' || !data) {
     return (
       <div className="flex justify-center bg-white items-center min-h-screen">
-        <Loader2 className="animate-spin h-10 w-10 text-blue-400" />
+        <Loader2 className="animate-spin h-10 w-10 text-blue-600" />
       </div>
     );
   }
@@ -82,78 +84,108 @@ export default function Dashboard() {
   return (
     <Layout title="dashboard">
       <Head>
-        <title>Dashboard - Prepkitty</title>
+        <title>Dashboard - PrepKitty</title>
       </Head>
-      <div className="font-sans text-gray-900">
-        <main className="container mx-auto px-6">
-          {/* Header Section */}
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="md:text-2xl text-xl font-extrabold text-start">
-                Welcome, {user.name || 'User'}!
-              </h1>
-              <p className="text-gray-600 text-lg text-start">
-                {`Let's get started.`}
-              </p>
-            </div>
-            <div className="flex gap-4">
+      
+      <div className="space-y-12 md:space-y-16">
+        
+        {/* HERO GREETING */}
+        <section className="relative">
+           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+              <div>
+                 <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-px bg-slate-200" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Overview</span>
+                 </div>
+                 <h1 className="text-4xl md:text-7xl font-black text-slate-900 tracking-tighter leading-none mb-4">
+                   Welcome back, <br />
+                   <span className="italic text-blue-600 underline decoration-blue-100 underline-offset-4">{user.name?.split(' ')[0] || 'User'}.</span>
+                 </h1>
+                 <p className="text-slate-500 font-medium italic text-lg">Your next career milestone is one practice away.</p>
+              </div>
+              
               <Link
                 href="/practice"
-                className="w-full max-w-[150px] p-3 rounded-full bg-blue-400 hover:bg-blue-500 font-semibold text-white transition-colors duration-200 flex items-center justify-center shadow-lg transform hover:scale-105 active:scale-100 disabled:opacity-50"
+                className="group relative flex items-center gap-6 bg-slate-900 text-white px-10 py-6 rounded-full hover:bg-slate-800 transition-all shadow-2xl shadow-slate-900/10 active:scale-95 text-center justify-center md:justify-start"
               >
-                Start Practice
+                <div className="text-left">
+                   <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Ready?</p>
+                   <p className="font-black text-sm">Start Practice Session</p>
+                </div>
+                <ArrowRight size={20} className="text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
               </Link>
-            </div>
-          </div>
+           </div>
+        </section>
 
-          {/* Performance Stats */}
+        {/* ANALYTICS SECTION */}
+        <section>
           <DashboardAnalytics
             results={scoresData?.user?.practiceResults || []}
             averageScore={averageScore}
             interviewsCompleted={interviewsCompleted}
           />
+        </section>
 
+        {/* RECENT ACTIVITY */}
+        <section className="space-y-8">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <Clock size={18} className="text-blue-500" />
+                    <h2 className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Recent Practices</h2>
+                </div>
+                {interviewsCompleted > 0 && (
+                <Link href="/practice" className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:opacity-70 transition-opacity italic">View Practices</Link>
+                )}
+            </div>
 
-          {/* Recent Sessions */}
-          <div>
-            <h2 className="text-xl font-bold mb-4 text-gray-900">
-              Recent Sessions
-            </h2>
             {scoresError ? (
-              <p className="text-red-500">Error loading sessions.</p>
+                <div className="p-10 rounded-[2.5rem] bg-red-50 border border-red-100 text-red-500 text-sm font-medium">Error loading practices.</div>
             ) : !scoresData ? (
-              <Loader2 className="animate-spin text-blue-400" size={24} />
+                <div className="flex items-center gap-3 p-10"><Loader2 className="animate-spin text-blue-500" /> <span className="text-slate-400 font-medium italic">Syncing records...</span></div>
             ) : interviewsCompleted === 0 ? (
-              <p className="text-gray-500 pb-10">
-                No recent sessions. Start practicing to see your results!
-              </p>
+                <div className="p-16 rounded-[2.5rem] bg-slate-50 border border-dotted border-slate-200 text-center space-y-4">
+                    <p className="text-slate-400 font-medium italic">No practices found yet. Kick off your first session today.</p>
+                    <Link href="/practice" className="inline-block text-blue-600 font-black uppercase text-[10px] tracking-widest underline decoration-blue-200 underline-offset-4">Get Started</Link>
+                </div>
             ) : (
-              <div className="space-y-4 mb-3">
-                {scoresData.user.practiceResults.slice(0, 5).map((result) => (
-                  <div
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {scoresData.user.practiceResults.slice(0, 4).map((result, idx) => (
+                    <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
                     key={result.id}
-                    className="bg-white p-4 rounded-xl border border-gray-200 flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-semibold">
-                        {result.jobTitle || 'General Practice'}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(result.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-lg text-blue-500">
-                        {result.score} / {result.totalQuestions}
-                      </p>
-                      <p className="text-sm text-gray-600">{result.mode}</p>
-                    </div>
-                  </div>
+                    className="group flex items-center justify-between p-6 rounded-[2rem] bg-white border border-slate-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-500/5 transition-all text-left"
+                    >
+                        <div className="flex items-center gap-6">
+                        <div>
+                            <p className="font-black text-slate-900 tracking-tight">{result.jobTitle || 'General Practice'}</p>
+                            <div className="flex flex-wrap items-center gap-3 text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">
+                                <span>{new Date(result.createdAt).toLocaleDateString()}</span>
+                                <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                <span className="italic">{result.mode}</span>
+                            </div>
+                        </div>
+                        </div>
+                        <div className="text-right">
+                        <p className="font-black text-2xl text-slate-900">
+                            {result.score}<span className="text-slate-300 text-sm font-medium">/{result.totalQuestions}</span>
+                        </p>
+                        </div>
+                    </motion.div>
                 ))}
-              </div>
+                </div>
             )}
-          </div>
-        </main>
+        </section>
+
+        {/* TIPS SECTION */}
+        <section className="bg-slate-50 p-10 rounded-[3rem] border border-slate-100">
+            <h4 className="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-4 italic">Professional Tip</h4>
+            <p className="text-slate-500 text-lg italic font-medium leading-relaxed max-w-3xl">
+                "Speak clearly and pause for 2 seconds after each major point. It projects internal calm and dominance in technical discussions."
+            </p>
+        </section>
+
       </div>
     </Layout>
   );
