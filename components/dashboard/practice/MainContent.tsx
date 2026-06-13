@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2 } from 'lucide-react';
+import { ArrowRight, Bot, BrainCircuit, CheckCircle2, Loader2, MessageSquare, Mic2, Volume2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import PracticeModeSwitcher from './PracticeModeSwitcher';
 import ChatView from './ChatView';
@@ -96,6 +97,11 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
   const [isSummarizing, setIsSummarizing] = useState(false);
   // Local state for toggling AI voice inside the chat modal. Initialized from prop.
   const [enableTTSState, setEnableTTSState] = useState<boolean>(enableTTS);
+
+  const profileTitle = user.practiceProfile?.jobTitle || 'Interview role';
+  const hasStarted =
+    (practiceMode === 'chat' && conversationHistory.length > 0) ||
+    (practiceMode === 'quiz' && (quizData !== null || quizCompleted));
 
 
   useEffect(() => {
@@ -427,58 +433,107 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
   };  
 
   return (
-    <div className="flex-1 flex flex-col h-full  min-h-0 relative">
-      
-
-      <PracticeModeSwitcher practiceMode={practiceMode} setPracticeMode={setPracticeMode} />
-
-      <div className="flex-1 flex flex-col items-center text-center p-4 overflow-y-auto custom-scrollbar pb-40 ">
-        {practiceMode === 'chat' ? (
-          <div className="flex-1 flex flex-col items-center w-full  pt-8">
-            {conversationHistory.length === 0 ? (
-              <div className="p-8 bg-white rounded-xl max-w-md text-gray-800 border border-gray-200">
-                <h2 className="text-2xl font-bold mb-2">Chat Mode</h2>
-                  <p className="text-gray-600 mb-6">The interview works best with headphones and a microphone.</p>
-                  <div className="flex items-center justify-center mb-4">
-                    <label className="flex items-center cursor-pointer select-none">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          className="sr-only"
-                          checked={enableTTSState}
-                          onChange={(e) => setEnableTTSState(e.target.checked)}
-                          aria-label="Enable AI Voice"
-                        />
-                        <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${enableTTSState ? 'bg-blue-400' : 'bg-gray-300'}`} />
-                        <div
-                          className={`dot absolute left-0 top-0 bg-white w-6 h-6 rounded-full shadow transform transition-transform ${enableTTSState ? 'translate-x-5' : 'translate-x-0'}`}
-                        />
-                      </div>
-                      <span className="ml-3 text-sm font-medium text-gray-700">Enable AI Voice</span>
-                    </label>
-                  </div>
-                <div className="flex justify-center items-center">
-                <button
-                  onClick={startInterview}
-                  disabled={isGenerating}
-                  className="w-full max-w-[200px] p-3 rounded-full bg-blue-400 hover:bg-blue-500 font-semibold text-white transition-colors duration-200 flex items-center justify-center shadow-lg transform hover:scale-105 active:scale-100 disabled:opacity-50"
-                >
-                  {isGenerating ? <Loader2 className="animate-spin mr-2" size={20} /> : 'Begin Interview'}
-                </button>
-                </div>
+    <div className="space-y-12 md:space-y-16">
+      {!hasStarted && (
+        <section className="relative">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-px bg-slate-200" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Practice</span>
               </div>
+              <h1 className="text-4xl md:text-7xl font-black text-slate-900 tracking-tighter leading-none mb-4">
+                Train for <br />
+                <span className="italic text-blue-600 underline decoration-blue-100 underline-offset-4">{profileTitle}.</span>
+              </h1>
+              <p className="text-slate-500 font-medium italic text-lg">Pick a mode and start practicing.</p>
+            </div>
+            <PracticeModeSwitcher practiceMode={practiceMode} setPracticeMode={setPracticeMode} />
+          </div>
+        </section>
+      )}
+
+      <section className="flex flex-col items-center text-center pb-28">
+        {practiceMode === 'chat' ? (
+          <div className="flex flex-col items-center w-full">
+            {conversationHistory.length === 0 ? (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="grid w-full overflow-hidden rounded-[2.5rem] border border-slate-100 bg-white text-left shadow-xl shadow-blue-500/5 lg:grid-cols-[1.05fr_0.95fr]"
+              >
+                <div className="p-8 md:p-10">
+                  <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-blue-600 text-white shadow-lg shadow-blue-600/20">
+                    <MessageSquare size={28} />
+                  </div>
+                  <h2 className="text-3xl font-black tracking-tighter text-slate-900 md:text-5xl italic">Interview practice</h2>
+                  <div className="mt-8 grid gap-3">
+                    {[
+                      { icon: Bot, text: 'AI asks interview questions' },
+                      { icon: Mic2, text: 'Speak or type your answers' },
+                      { icon: CheckCircle2, text: 'Get a simple review after' },
+                    ].map((item) => (
+                      <div key={item.text} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white">
+                          <item.icon size={18} />
+                        </div>
+                        <span className="text-sm font-black text-slate-700 italic">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col justify-between bg-slate-900 p-8 text-white md:p-10">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Setup</p>
+                    <div className="mt-6 rounded-3xl border border-white/10 bg-white/10 p-5">
+                      <label className="flex items-center justify-between gap-5 cursor-pointer group">
+                        <span className="flex items-center gap-3">
+                          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-slate-950">
+                            <Volume2 size={19} />
+                          </span>
+                          <span>
+                            <span className="block text-sm font-black">AI voice</span>
+                            <span className="block text-xs font-bold text-slate-400">{enableTTSState ? 'On' : 'Off'}</span>
+                          </span>
+                        </span>
+                        <span className="relative">
+                          <input
+                            type="checkbox"
+                            className="sr-only"
+                            checked={enableTTSState}
+                            onChange={(e) => setEnableTTSState(e.target.checked)}
+                          />
+                          <span className={`block h-8 w-16 rounded-full transition-colors duration-300 ${enableTTSState ? 'bg-blue-500' : 'bg-white/20'}`} />
+                          <span className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow-sm transition-transform duration-300 ${enableTTSState ? 'translate-x-8' : 'translate-x-0'}`} />
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={startInterview}
+                    disabled={isGenerating}
+                    className="mt-10 w-full rounded-full bg-white px-10 py-6 text-slate-900 font-black transition-all shadow-2xl shadow-slate-900/10 hover:bg-slate-50 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+                  >
+                    {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <>Start Interview <ArrowRight size={19} /></>}
+                  </button>
+                </div>
+              </motion.div>
             ) : chatCompleted ? (
               isSummarizing ? (
                 <div className="flex flex-col items-center justify-center h-full">
                   <Loader2 className="animate-spin h-12 w-12 text-blue-400" />
-                  <p className="mt-4 text-lg text-gray-600">Generating your performance review...</p>
+                  <p className="mt-8 text-lg font-black italic text-slate-900">Creating your review...</p>
                 </div>
               ) : (
                 <ChatActionResult
-                  title="Interview Performance Review"
+                  title="Your Review"
                   summary={chatSummary}
                   onStartNew={startInterview}
-                  buttonText="Start New Chat"
+                  buttonText="Start Again"
+                  onSecondaryAction={() => setPracticeMode('quiz')}
+                  secondaryButtonText="Switch to Quiz"
                   isModal={false}
                 />
               )
@@ -487,14 +542,16 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
             )}
           </div>
         ) : (
-          <div className="flex-1 flex flex-col items-center w-full pt-8">
+          <div className="flex flex-col items-center w-full">
             {quizCompleted ? (
               <ActionResult
-                title="Quiz Completed!"
+                title="Quiz Results"
                 score={score}
                 total={10}
                 onStartNew={startInterview}
-                buttonText="Start New Quiz"
+                buttonText="Start Again"
+                onSecondaryAction={() => setPracticeMode('chat')}
+                secondaryButtonText="Switch to Interview"
                 wrongAnswers={wrongAnswers}
                 isModal={false}
               />
@@ -508,23 +565,51 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
                 isGenerating={isGenerating}
               />
             ) : (
-              <div className="p-8 bg-white rounded-xl max-w-md text-gray-800 border border-gray-200">
-                <h2 className="text-2xl font-bold mb-2">Quiz Mode</h2>
-                <p className="text-gray-600 mb-6">Prepare for a series of multiple-choice questions.</p>
-                <div className="flex justify-center items-center">
-                <button
-                  onClick={startInterview}
-                  disabled={isGenerating}
-                  className="w-full max-w-[200px] p-3 rounded-full bg-blue-400 hover:bg-blue-500 font-semibold text-white transition-colors duration-200 flex items-center justify-center shadow-lg transform hover:scale-105 active:scale-100 disabled:opacity-50"
-                >
-                  {isGenerating ? <Loader2 className="animate-spin" size={22} /> : 'Start Quiz'}
-                </button>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="grid w-full overflow-hidden rounded-[2.5rem] border border-slate-100 bg-white text-left shadow-xl shadow-blue-500/5 lg:grid-cols-[0.95fr_1.05fr]"
+              >
+                <div className="bg-slate-900 p-8 text-white md:p-10">
+                  <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-blue-600 text-white shadow-lg shadow-blue-600/20">
+                    <BrainCircuit size={30} />
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Quiz setup</p>
+                  <h2 className="mt-5 text-3xl font-black tracking-tighter md:text-5xl italic">Quiz practice</h2>
+                  <div className="mt-8 grid grid-cols-3 gap-3">
+                    {['10', 'A-D', 'Score'].map((item) => (
+                      <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-center">
+                        <p className="text-lg font-black italic">{item}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+                <div className="flex flex-col justify-between p-8 md:p-10">
+                  <div className="grid gap-3">
+                    {[
+                      'Questions match your role',
+                      'Answer 10 quick questions',
+                      'See missed answers at the end',
+                    ].map((text) => (
+                      <div key={text} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+                        <CheckCircle2 className="text-blue-500" size={20} />
+                        <span className="text-sm font-black text-slate-700 italic">{text}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={startInterview}
+                    disabled={isGenerating}
+                    className="mt-10 w-full rounded-full bg-slate-900 px-10 py-6 text-white font-black transition-all shadow-2xl shadow-slate-900/10 hover:bg-slate-800 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+                  >
+                    {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <>Start Quiz <ArrowRight size={19} /></>}
+                  </button>
+                </div>
+              </motion.div>
             )}
           </div>
         )}
-      </div>
+      </section>
 
       {(practiceMode === 'chat' && conversationHistory.length > 0 && !quizCompleted && !chatCompleted) && (
         <ChatInput
