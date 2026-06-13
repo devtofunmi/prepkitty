@@ -16,6 +16,9 @@ if (!API_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY as string);
+// Tip: Use v1 for stable model access
+// const genAI = new GoogleGenerativeAI(API_KEY as string); 
+// Note: SDK usually manages versioning, but model naming must match.
 
 // Helper to convert file to generative part
 function fileToGenerativePart(buffer: Buffer, mimeType: string) {
@@ -47,6 +50,7 @@ const uploadToCloudinary = async (filePath: string, mimeType: string | null) => 
     formData.append("file", blob, 'cv.pdf');
     formData.append("upload_preset", "users_avater");
 
+    console.log("Uploading to Cloudinary...");
     const response = await fetch(
         "https://api.cloudinary.com/v1_1/drirsnp0c/image/upload",
         {
@@ -58,6 +62,7 @@ const uploadToCloudinary = async (filePath: string, mimeType: string | null) => 
     const data = await response.json();
 
     if (!response.ok) {
+        console.error("Cloudinary error:", data);
         throw new Error(data.error?.message || "Cloudinary upload failed");
     }
     console.log("File uploaded to Cloudinary:", data.secure_url);
@@ -98,12 +103,10 @@ export default async function handler(
         });
     }
 
-    await uploadToCloudinary(uploadedFilePath, mimeType);
-
     const fileBuffer = fs.readFileSync(uploadedFilePath);
 
     const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-flash-latest",
         safetySettings: [
             {
                 category: HarmCategory.HARM_CATEGORY_HARASSMENT,
@@ -136,7 +139,6 @@ export default async function handler(
 
     // Clean the response to ensure it's valid JSON
     const jsonString = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
-
     const extractedData = JSON.parse(jsonString);
 
     return res.status(200).json(extractedData);
