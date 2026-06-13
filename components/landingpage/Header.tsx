@@ -1,83 +1,142 @@
 
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSession } from "next-auth/react";
 
 const navLinks = [
-  { href: "#features", text: "Features" },
-  // { href: "#testimonials", text: "Testimonials" },
-  { href: "#faq", text: "FAQ" },
+  { href: "/#features", text: "Features" },
+  { href: "/#faq", text: "FAQ" },
 ];
 
 export const Header = () => {
-  const [isSticky, setSticky] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { status } = useSession();
+  const isLoggedIn = status === "authenticated";
 
   useEffect(() => {
-    const handleScroll = () => {
-      setSticky(window.scrollY > 0);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useLayoutEffect(() => {
-    const body = document.body;
-    if (mobileNavOpen) {
-      body.style.overflow = 'hidden';
-    } else {
-      body.style.overflow = 'unset';
-    }
-  }, [mobileNavOpen]);
-
-  const headerClasses = mobileNavOpen 
-    ? "z-[51] fixed top-0 bg-white border-b border-gray-200"
-    : isSticky 
-    ? "z-40 fixed top-0 backdrop-blur-md bg-white/90 border-b border-gray-200" 
-    : "z-40 bg-white";
-
   return (
-    <header className={`flex justify-between items-center px-8 py-4 w-full ${headerClasses}`}>
-      <div>
-        <Image src="/prepkitty_logo.png" alt="Prepkitty Logo" width={120} height={40} />
-      </div>
-      
-      <nav className="hidden md:flex gap-8">
-        {navLinks.map((link) => (
-          <a key={link.href} href={link.href} className="hover:text-blue-500 font-medium text-base">{link.text}</a>
-        ))}
-      </nav>
-      
-      <Link href="/login" className="hidden md:block px-5 py-2 rounded-full bg-blue-400 hover:bg-blue-500 text-white font-semibold shadow-lg transition-colors text-base">
-        Log In
-      </Link>
-      
-      <button 
-        className="md:hidden p-2 text-gray-600 hover:text-blue-500 z-[60]"
-        onClick={() => setMobileNavOpen(!mobileNavOpen)}
-        aria-label="Toggle navigation"
-      >
-        {mobileNavOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
-
-      <div className={`fixed top-0 left-0 h-full w-full bg-white transition-transform duration-300 ease-in-out z-50 md:hidden ${mobileNavOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="pt-20 px-8 flex flex-col space-y-4">
-          {navLinks.map((link) => (
-            <a 
-              key={link.href} 
-              href={link.href} 
-              className="text-2xl font-bold py-2 border-b border-gray-200 hover:text-blue-500"
-              onClick={() => setMobileNavOpen(false)}
-            >
-              {link.text}
-            </a>
-          ))}
-          <Link href="/login" className="mt-6 px-5 py-3 text-center rounded-full bg-blue-400 hover:bg-blue-500 text-white font-semibold shadow-lg transition-colors text-xl">
-            Log In
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "py-4" : "py-6"
+        }`}
+    >
+      <div className="max-w-7xl mx-auto px-6">
+        <nav className={`flex items-center justify-between px-6 py-3 rounded-2xl transition-all duration-300 ${isScrolled ? "glass-dark border border-white/10" : "bg-transparent"
+          }`}>
+          {/* Logo Area */}
+          <Link href="/" className="flex items-center group">
+            <Image src="/prepkitty_logo.png" alt="Prepkitty Logo" width={120} height={40} />
           </Link>
-        </div>
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                {link.text}
+              </a>
+            ))}
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="hidden md:flex items-center gap-4">
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                className="px-6 py-2.5 bg-blue-500 text-white text-sm font-bold rounded-xl hover:bg-blue-600 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="px-5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-6 py-2.5 bg-blue-500 text-white text-sm font-bold rounded-xl hover:bg-blue-600 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
+                >
+                  Start Practicing
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Toggle */}
+          <button
+            className="md:hidden p-2 text-white/70 hover:text-white"
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+          >
+            {mobileNavOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </nav>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {mobileNavOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-40 md:hidden glass-dark pt-24 px-6 h-screen"
+          >
+            <div className="flex flex-col gap-6">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="text-3xl font-bold text-slate-900 hover:text-blue-500 transition-colors"
+                  onClick={() => setMobileNavOpen(false)}
+                >
+                  {link.text}
+                </a>
+              ))}
+              <hr className="border-slate-200" />
+              {isLoggedIn ? (
+                <Link
+                  href="/dashboard"
+                  className="w-full py-4 bg-blue-500 text-white text-center rounded-xl font-bold text-lg shadow-xl shadow-blue-500/20"
+                  onClick={() => setMobileNavOpen(false)}
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-xl font-medium text-slate-500"
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="w-full py-4 bg-blue-500 text-white text-center rounded-xl font-bold text-lg shadow-xl shadow-blue-500/20"
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };
