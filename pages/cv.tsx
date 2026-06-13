@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import Head from 'next/head';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { prisma } from '@/lib/prisma';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import Layout from '../components/dashboard/Layout';
 import { CVTemplate } from '../components/dashboard/CVTemplate';
-import { Loader2, Download, Edit, PlusCircle } from 'lucide-react';
+import { Loader2, Download, Edit, PlusCircle, Save, FileText, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/router';
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -186,17 +187,39 @@ export default function CVPage({ cv: initialCv }: InferGetServerSidePropsType<ty
   if (!cv) {
     return (
       <Layout>
-        <div className="p-6 flex justify-center flex-col items-center text-center">
-          <h1 className="text-3xl font-bold mb-4 text-gray-900">Your CV</h1>
-          <p className="mb-4 text-gray-900">You don&apos;t have a CV yet. Generate one from your profile to get started.</p>
-          <button
-            onClick={handleGenerateNewCV}
-            className="bg-blue-400 hover:bg-blue-500 cursor-pointer text-white font-bold py-2 px-4 rounded-full flex items-center mx-auto"
-            disabled={isGenerating}
-          >
-            {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <PlusCircle className="mr-2" />}
-            {isGenerating ? 'Generating...' : 'Generate CV from Profile'}
-          </button>
+        <Head>
+          <title>CV Profile - PrepKitty</title>
+        </Head>
+        <div className="space-y-12 md:space-y-16">
+          <section className="relative">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-px bg-slate-200" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">CV Profile</span>
+            </div>
+            <h1 className="text-4xl md:text-7xl font-black text-slate-900 tracking-tighter leading-none mb-4">
+              Build your <br />
+              <span className="italic text-blue-600 underline decoration-blue-100 underline-offset-4">CV.</span>
+            </h1>
+            <p className="text-slate-500 font-medium italic text-lg">Create a clean CV from your profile details.</p>
+          </section>
+
+          <section className="rounded-[3rem] border border-dotted border-slate-200 bg-slate-50 p-8 text-center md:p-16">
+            <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-[2rem] bg-white text-blue-600 shadow-sm">
+              <FileText size={34} />
+            </div>
+            <h2 className="mb-4 text-3xl font-black tracking-tighter text-slate-900 italic">No CV yet</h2>
+            <p className="mx-auto mb-8 max-w-md text-slate-500 font-medium italic">
+              Generate your first CV using the profile information you already added.
+            </p>
+            <button
+              onClick={handleGenerateNewCV}
+              className="mx-auto flex items-center justify-center gap-3 rounded-full bg-slate-900 px-8 py-5 font-black text-white shadow-2xl shadow-slate-900/10 transition-all hover:bg-slate-800 active:scale-95 disabled:opacity-50"
+              disabled={isGenerating}
+            >
+              {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <PlusCircle size={20} />}
+              {isGenerating ? 'Generating...' : 'Generate CV'}
+            </button>
+          </section>
         </div>
       </Layout>
     );
@@ -204,47 +227,91 @@ export default function CVPage({ cv: initialCv }: InferGetServerSidePropsType<ty
 
   return (
     <Layout>
-      <div className="p-6">
-        <div ref={cvRef}>
-          <CVTemplate data={cv} isEditing={isEditing} onDataChange={handleDataChange} />
-        </div>
-        <div className="flex justify-center items-center mt-4">
-          <div className="flex gap-2">
-            {isEditing ? (
+      <Head>
+        <title>CV Profile - PrepKitty</title>
+      </Head>
+      <div className="space-y-12 md:space-y-16">
+        <section className="relative">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-px bg-slate-200" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">CV Profile</span>
+              </div>
+              <h1 className="text-4xl md:text-7xl font-black text-slate-900 tracking-tighter leading-none mb-4">
+                Your CV, <br />
+                <span className="italic text-blue-600 underline decoration-blue-100 underline-offset-4">ready to polish.</span>
+              </h1>
+              <p className="text-slate-500 font-medium italic text-lg">Edit, preview, and download your professional CV.</p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={handleSave}
-                className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full cursor-pointer flex items-center"
-                disabled={isSaving}
+                onClick={handlePrint}
+                className="flex items-center justify-center gap-3 rounded-full border border-slate-100 bg-white px-8 py-5 font-black text-slate-900 shadow-sm transition-all hover:border-blue-100 hover:bg-blue-50 active:scale-95 disabled:opacity-50"
+                disabled={isDownloading}
               >
-                 {isSaving ? (
-                              <Loader2 className="animate-spin mx-auto text-white" />
-                            ) : (
-                              'Save'
-                            )}
+                {isDownloading ? <Loader2 className="animate-spin" size={20} /> : <Download size={20} />}
+                {isDownloading ? 'Preparing...' : 'Download'}
               </button>
-            ) : (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full cursor-pointer flex items-center"
-              >
-                <Edit size={20} className="mr-2" />
-                Edit
-              </button>
-            )}
-            <button
-              onClick={handlePrint}
-              className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full cursor-pointer flex items-center"
-              disabled={isDownloading}
-            >
-              {isDownloading ? (
-                <Loader2 className="animate-spin mr-2" />
+
+              {isEditing ? (
+                <button
+                  onClick={handleSave}
+                  className="flex items-center justify-center gap-3 rounded-full bg-slate-900 px-8 py-5 font-black text-white shadow-2xl shadow-slate-900/10 transition-all hover:bg-slate-800 active:scale-95 disabled:opacity-50"
+                  disabled={isSaving}
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+                  {isSaving ? 'Saving...' : 'Save'}
+                </button>
               ) : (
-                <Download size={20} className="mr-2" />
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center justify-center gap-3 rounded-full bg-slate-900 px-8 py-5 font-black text-white shadow-2xl shadow-slate-900/10 transition-all hover:bg-slate-800 active:scale-95"
+                >
+                  <Edit size={20} />
+                  Edit CV
+                </button>
               )}
-              {isDownloading ? '' : 'Download CV'}
-            </button>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <section className="grid gap-8 xl:grid-cols-[1fr_280px] xl:items-start">
+          <div className="rounded-[3rem] border border-slate-100 bg-slate-50 p-3 shadow-xl shadow-blue-500/5 md:p-8">
+            <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="text-xs font-black uppercase tracking-widest text-slate-900 italic">CV Preview</h2>
+                <p className="mt-2 text-sm font-medium text-slate-400 italic">
+                  {isEditing ? 'Editing mode is on.' : 'Preview mode is on.'}
+                </p>
+              </div>
+              <span className={`w-fit rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest ${
+                isEditing ? 'bg-blue-50 text-blue-600' : 'bg-white text-slate-400'
+              }`}>
+                {isEditing ? 'Editing' : 'Preview'}
+              </span>
+            </div>
+
+            <div className="overflow-x-auto rounded-[2rem]">
+              <div ref={cvRef} className="min-w-[720px] md:min-w-0">
+                <CVTemplate data={cv} isEditing={isEditing} onDataChange={handleDataChange} />
+              </div>
+            </div>
+          </div>
+
+          <aside className="rounded-[2.5rem] border border-slate-100 bg-white p-6 shadow-sm xl:sticky xl:top-8">
+            <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+              <Sparkles size={22} />
+            </div>
+            <h3 className="mb-3 text-lg font-black tracking-tight text-slate-900 italic">Quick tips</h3>
+            <div className="space-y-4 text-sm font-medium leading-relaxed text-slate-500 italic">
+              <p>Keep your summary short and focused.</p>
+              <p>Use clear project results, not only tool names.</p>
+              <p>Download after saving your latest edits.</p>
+            </div>
+          </aside>
+        </section>
       </div>
     </Layout>
   );
