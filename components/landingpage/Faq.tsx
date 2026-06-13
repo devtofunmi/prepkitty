@@ -1,5 +1,7 @@
+
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const faqs = [
   {
@@ -16,7 +18,7 @@ const faqs = [
   },
   {
     question: "What kind of roles can I practice for?",
-    answer: "You can practice for a wide range of roles."
+    answer: "You can practice for a wide range of roles from Banking to Tech."
   }
 ];
 
@@ -24,35 +26,49 @@ export const Faq = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="px-6 py-20 bg-gray-50" data-aos="fade-up">
-      <div className="text-center max-w-4xl mx-auto">
-        <h2 className="text-5xl font-extrabold mb-4 text-gray-900">Frequently Asked Questions</h2>
-        <p className="max-w-2xl mx-auto text-gray-600 mb-12 text-lg font-normal">
-          Find answers to the most common questions about Prepkitty.
-        </p>
-      </div>
-      <div className="max-w-4xl mx-auto space-y-4">
-        {faqs.map((faq, index) => (
-          <div key={index} className="bg-white rounded-xl  border border-gray-200">
-            <button 
-              onClick={() => setOpenFaq(openFaq === index ? null : index)}
-              className="flex justify-between items-center w-full text-left p-6 focus:outline-none"
+    <section id="faq" className="relative py-24 bg-slate-50">
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-black mb-6 text-slate-900">Frequently Asked Questions</h2>
+          <p className="text-slate-600 text-lg">Find answers to the most common questions about Prepkitty.</p>
+        </div>
+
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <motion.div 
+              key={index}
+              className={`rounded-2xl border transition-all duration-300 ${
+                openFaq === index ? "bg-white border-blue-200 shadow-lg shadow-blue-500/5" : "border-slate-200 hover:border-slate-300 bg-white/50"
+              }`}
             >
-              <h3 className="text-lg md:text-xl font-bold text-gray-900">{faq.question}</h3>
-              <ChevronDown 
-                className={`transform transition-transform duration-300 ${openFaq === index ? 'rotate-180 text-blue-400' : 'text-gray-500'}`}
-                size={24}
-              />
-            </button>
-            <div 
-              className={`grid transition-all duration-300 ease-in-out ${openFaq === index ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
-            >
-              <div className="overflow-hidden px-6 pb-6">
-                <p className="text-gray-700 text-base font-normal">{faq.answer}</p>
-              </div>
-            </div>
-          </div>
-        ))}
+              <button 
+                onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                className="flex justify-between items-center w-full text-left p-6 md:p-8 focus:outline-none group"
+              >
+                <h3 className="text-lg md:text-xl font-bold text-slate-800 group-hover:text-slate-900 transition-colors uppercase tracking-tight">{faq.question}</h3>
+                <div className={`p-2 rounded-xl transition-all duration-300 ${openFaq === index ? "bg-blue-500 text-white rotate-180" : "bg-slate-100 text-slate-400"}`}>
+                  <ChevronDown size={20} />
+                </div>
+              </button>
+              
+              <AnimatePresence>
+                {openFaq === index && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-6 md:px-8 pb-8">
+                      <p className="text-slate-600 text-base md:text-lg leading-relaxed">{faq.answer}</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
