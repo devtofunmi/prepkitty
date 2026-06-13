@@ -1,3 +1,4 @@
+
 import React from "react";
 import Image from 'next/image';
 import Link from "next/link";
@@ -5,9 +6,9 @@ import { useRouter } from "next/router";
 import {
   LayoutGrid,
   Mic,
-  Settings,
   LogOut,
-  User,
+  Zap,
+  Briefcase
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -26,83 +27,72 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onOpenPricing, isMobile }) => {
   const navItems = [
     { name: "Dashboard", icon: LayoutGrid, href: "/dashboard" },
     { name: "Practice", icon: Mic, href: "/practice" },
-    { name: "CV", icon: User, href: "/cv" },
+    { name: "CV Profile", icon: Briefcase, href: "/cv" },
   ];
 
   return (
-  <aside data-is-mobile={isMobile ? 'true' : 'false'} className={`p-6 h-full flex flex-col font-geist bg-white`}>
-      <div className="mb-10">
-        <Image src="/prepkitty_logo.png" alt="Prepkitty Logo" width={120} height={40} />
+  <aside data-is-mobile={isMobile ? 'true' : 'false'} className={`p-6 md:p-8 h-full flex flex-col font-sans bg-white`}>
+      <div className="mb-10 lg:mb-12">
+        <Link href="/">
+           <Image src="/prepkitty_logo.png" alt="PrepKitty" width={120} height={40} className="priority" />
+        </Link>
       </div>
-      <nav className="flex-1">
-        <ul className="space-y-2">
+
+      <div className="mb-4 px-1">
+         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Menu</p>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto">
+        <ul className="space-y-1">
           {navItems.map((item) => {
             const isActive = router.pathname === item.href;
             return (
               <li key={item.name}>
                 <Link
                   href={item.href}
-                  className={`flex items-center space-x-3 px-3 py-2.5 rounded-full transition-colors duration-200 ${
+                  className={`flex items-center space-x-4 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
                     isActive 
-                      ? 'bg-blue-50 text-blue-400 font-semibold' 
-                      : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-black' 
+                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-transparent hover:border-slate-100 font-medium'
                   }`}
                 >
                   <item.icon
-                    size="20"
-                    className="transition-transform"
+                    size="18"
+                    className={`${isActive ? 'text-white' : 'text-slate-400 group-hover:text-blue-500'} transition-colors`}
                   />
-                  <span className="transition-transform text-base">{item.name}</span>
+                  <span className="text-sm tracking-tight">{item.name}</span>
                 </Link>
               </li>
             );
           })}
         </ul>
       </nav>
-      <div className="mt-auto pt-6 border-t border-gray-200">
-        <div className="mb-4">
-          <button
-            onClick={() => onOpenPricing && onOpenPricing()}
-            className="w-full cursor-pointer text-left px-3 py-2.5 rounded-3xl bg-blue-50 text-blue-400 font-semibold mb-3"
-          >
-            Get Unlimited Interviews
-          </button>
-        </div>
-        <div className="mb-4">
-          <Link
-            href="/settings"
-            className={`flex items-center space-x-3 px-3 py-2.5 rounded-full transition-colors duration-200 ${
-              router.pathname === '/settings' 
-                ? 'bg-blue-50 text-blue-400 font-semibold' 
-                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-            }`}
-          >
-            <Settings 
-              size="20" 
-              className="transition-transform" 
-            />
-            <span className="transition-transform text-base">Settings</span>
-          </Link>
+
+      <div className="mt-auto space-y-6 lg:space-y-8">
+        <div className="px-1">
+           <button
+             onClick={() => onOpenPricing && onOpenPricing()}
+             className="w-full relative group p-5 rounded-[1.5rem] bg-slate-900 text-white overflow-hidden transition-all hover:brightness-110 active:scale-[0.98]"
+           >
+             <div className="absolute top-0 right-0 p-2 opacity-20"><Zap size={32} className="text-blue-400" /></div>
+             <div className="relative z-10 text-left py-1">
+                <p className="text-xs font-black leading-tight">Go Unlimited</p>
+             </div>
+           </button>
         </div>
 
-        <div className="flex items-center space-x-3 text-gray-800 mb-4 p-2">
-          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-            {user?.image ? (
-              <Image src={user.image} alt="user" width={32} height={32} className="rounded-full" />
-            ) : (
-              <User size={16} className="text-gray-500" />
-            )}
-          </div>
-          <span className="font-medium text-sm">{user?.name || 'User'}</span>
+        <div className="space-y-4">
+           <div className="flex items-center justify-between px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100">
+              <p className="font-black text-xs text-slate-900 truncate max-w-[180px]">{user?.name || 'User'}</p>
+              <button 
+                onClick={() => signOut()}
+                className="text-slate-400 hover:text-red-500 transition-all ml-2"
+                title="Logout"
+              >
+                <LogOut size={16} />
+              </button>
+           </div>
         </div>
-       
-        <button
-          onClick={() => signOut()}
-          className="flex items-center space-x-3 px-3 py-2.5 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900 w-full transition-colors duration-200"
-        >
-          <LogOut size="20" />
-          <span className="font-medium text-base">Logout</span>
-        </button>
       </div>
     </aside>
   );
