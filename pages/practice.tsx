@@ -44,20 +44,15 @@ export default function Practice() {
   const { user } = data;
 
   return (
-    <>
-    <Layout title="interview">
+    <Layout title="Practice">
       <Head>
-        <title>Practice - Prepkitty</title>
+        <title>Practice - PrepKitty</title>
       </Head>
       <ToastContainer />
-      <div className="font-sans text-gray-900 p-6 h-full flex flex-col lg:flex-row gap-6 relative">
-
-        <div className={`lg:flex flex-1`}>
-          <MainContent user={user} />
-        </div>
+      <div className="w-full max-w-7xl mx-auto pb-32">
+        <MainContent user={user} />
         {showPricingModal && <PricingModal setShowPricingModal={setShowPricingModal} />}
       </div>
-      </Layout>
-    </>
+    </Layout>
   );
 }
