@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
-import { Loader2, ArrowUp } from 'lucide-react';
+import { Loader2, ArrowUp, Mic } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ChatInputProps {
   userResponse: string;
@@ -16,12 +18,14 @@ const ChatInput: React.FC<ChatInputProps> = ({ userResponse, setUserResponse, is
   const [recordingTime, setRecordingTime] = useState(0);
 
   useEffect(() => {
-    navigator.permissions.query({ name: 'microphone' as PermissionName }).then((permissionStatus) => {
-      setMicPermission(permissionStatus.state);
-      permissionStatus.onchange = () => {
+    if (typeof window !== 'undefined' && navigator.permissions) {
+      navigator.permissions.query({ name: 'microphone' as PermissionName }).then((permissionStatus) => {
         setMicPermission(permissionStatus.state);
-      };
-    });
+        permissionStatus.onchange = () => {
+          setMicPermission(permissionStatus.state);
+        };
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -38,12 +42,12 @@ const ChatInput: React.FC<ChatInputProps> = ({ userResponse, setUserResponse, is
 
   const handleMicWithPermissionCheck = async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setMicError("Microphone not detected in this browser.");
+      setMicError("Microphone not detected.");
       return;
     }
 
     if (micPermission === 'denied') {
-      setMicError("Microphone access denied. Please enable it in your browser settings.");
+      setMicError("Access denied. Check settings.");
       return;
     }
 
@@ -51,7 +55,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ userResponse, setUserResponse, is
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true });
       } catch {
-        setMicError("Microphone access denied. Please enable it in your browser settings.");
+        setMicError("Access denied.");
         return;
       }
     }
@@ -60,44 +64,67 @@ const ChatInput: React.FC<ChatInputProps> = ({ userResponse, setUserResponse, is
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 w-full flex justify-center px-4 lg:left-64 lg:w-[calc(100%-16rem)]">
-      <div className="w-full max-w-2xl mx-auto flex items-center gap-2 relative bg-white p-4 border border-gray-200 rounded-xl shadow-sm">
-        {micError && <div className="absolute -top-12 text-red-500 text-sm">{micError}</div>}
-        <textarea
-          className="flex-1 p-2 bg-transparent rounded-lg text-gray-800 focus:outline-none resize-none custom-scrollbar"
-          placeholder="Type your answer here... or use the microphone to speak."
-          value={userResponse}
-          onChange={(e) => setUserResponse(e.target.value)}
-          disabled={isGenerating}
-          rows={2}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              if (!isGenerating) sendUserResponse();
-            }
-          }}
-        />
-        <div className="flex items-center">
-          {isRecording && <div className="text-sm text-red-500 w-20">{`${Math.floor(recordingTime / 60).toString().padStart(2, '0')}:${(recordingTime % 60).toString().padStart(2, '0')}`}</div>}
+    <div className="fixed bottom-0 left-0 right-0 w-full flex justify-center pb-8 pt-4 px-6 lg:left-[280px] lg:w-[calc(100%-280px)] z-50 pointer-events-none">
+      <div className="w-full max-w-4xl mx-auto pointer-events-auto">
+        <AnimatePresence>
+           {micError && (
+             <motion.div 
+               initial={{ opacity: 0, y: 10 }}
+               animate={{ opacity: 1, y: 0 }}
+               exit={{ opacity: 0, y: 10 }}
+               className="mb-4 bg-red-50 text-red-500 text-[10px] font-black uppercase tracking-widest p-3 rounded-2xl border border-red-100 text-center shadow-xl"
+             >
+               {micError}
+             </motion.div>
+           )}
+        </AnimatePresence>
+
+        <div className="relative bg-white/90 border border-white rounded-[2rem] shadow-[0_24px_70px_rgba(15,23,42,0.18)] backdrop-blur-xl p-3 flex min-w-0 items-center gap-2">
+          
           <button
             onClick={handleMicWithPermissionCheck}
-            disabled={isRecording || isGenerating}
-            className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors duration-200 disabled:opacity-50"
+            disabled={isGenerating}
+            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+              isRecording 
+                ? 'bg-red-500 text-white animate-pulse' 
+                : 'bg-slate-100 text-slate-500 hover:text-slate-950 hover:bg-slate-200'
+            } disabled:opacity-50`}
             title={isRecording ? 'Recording...' : 'Record voice'}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={isRecording ? 'text-red-500' : ''}>
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2h2v2a5 5 0 0 0 10 0v-2h2z" fill="currentColor"/>
-            </svg>
+            <Mic size={20} />
           </button>
+
+          <textarea
+            className="min-w-0 flex-1 p-4 bg-transparent rounded-2xl text-slate-900 font-bold text-sm focus:outline-none resize-none custom-scrollbar placeholder:text-slate-300"
+            placeholder={isRecording ? "Listening..." : "Type your answer..."}
+            value={userResponse}
+            onChange={(e) => setUserResponse(e.target.value)}
+            disabled={isGenerating}
+            rows={1}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!isGenerating) sendUserResponse();
+              }
+            }}
+          />
+
+          <div className="flex items-center gap-3 pr-2">
+            {isRecording && (
+              <span className="text-[10px] font-black text-red-500 tabular-nums">
+                {`${Math.floor(recordingTime / 60).toString().padStart(2, '0')}:${(recordingTime % 60).toString().padStart(2, '0')}`}
+              </span>
+            )}
+            
+            <button
+              onClick={sendUserResponse}
+              disabled={isGenerating || (!userResponse.trim() && !isRecording)}
+              className="w-14 h-14 rounded-full bg-slate-950 text-white transition-all flex items-center justify-center shadow-lg disabled:opacity-50 disabled:bg-slate-100 disabled:text-slate-300 transform hover:scale-105 active:scale-95"
+            >
+              {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <ArrowUp size={20} />}
+            </button>
+          </div>
         </div>
-        <button
-          onClick={sendUserResponse}
-          disabled={isGenerating || !userResponse.trim()}
-          className="p-3 rounded-full bg-blue-400 hover:bg-blue-500 text-white transition-colors duration-200 flex items-center justify-center shadow-md disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-100"
-        >
-          {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <ArrowUp size={20} />}
-        </button>
       </div>
     </div>
   );
