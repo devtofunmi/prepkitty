@@ -1,5 +1,7 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Bot, User as UserIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface ChatViewProps {
   conversationHistory: Array<{ role: string; parts: string }>;
@@ -15,29 +17,39 @@ const ChatView: React.FC<ChatViewProps> = ({ conversationHistory }) => {
   }, [conversationHistory]);
 
   const formatMessage = (text: string) => {
-    const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-black">$1</strong>');
     return <div dangerouslySetInnerHTML={{ __html: formattedText.replace(/\n/g, '<br />') }} />;
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 space-y-4 text-left font-sans">
+    <div className="w-full max-w-4xl mx-auto space-y-6 text-left font-sans pb-10 overflow-hidden">
       {conversationHistory.map((msg, index) => (
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
           key={index}
-          className={`flex items-start gap-4 ${msg.role === 'User' ? 'justify-start' : ''} w-full`}>
-          
-          {(msg.role === 'AI' || msg.role === 'User') && (
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === 'AI' ? 'bg-emerald-100' : 'bg-gray-200'}`}>
-              {msg.role === 'AI' ? <Bot size={18} className="text-emerald-600" /> : <UserIcon size={18} className="text-gray-600" />}
-            </div>
+          className={`flex w-full min-w-0 items-start gap-4 ${msg.role === 'User' ? 'flex-row-reverse' : ''}`}
+        >
+          {msg.role === 'AI' ? (
+             <div className="w-11 h-11 rounded-2xl bg-blue-600 border border-blue-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/20">
+                <Bot size={20} className="text-white" />
+             </div>
+          ) : (
+             <div className="w-11 h-11 rounded-2xl bg-slate-950 flex items-center justify-center flex-shrink-0 shadow-lg shadow-slate-950/15">
+                <UserIcon size={20} className="text-white" />
+             </div>
           )}
 
-          <div className={`p-4 rounded-xl max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl break-words break-all min-w-0 ${msg.role === 'AI' ? 'bg-white border border-gray-200' : 'bg-emerald-600 text-white'}`}>
-            <div className="text-base">
-              {formatMessage(msg.parts)}
-            </div>
+          <div 
+            className={`min-w-0 max-w-[85%] overflow-hidden break-words [overflow-wrap:anywhere] px-6 py-4 rounded-3xl text-sm leading-relaxed shadow-sm ${
+              msg.role === 'AI' 
+                ? 'bg-white/90 border border-white text-slate-900 font-medium shadow-[0_14px_35px_rgba(15,23,42,0.08)]' 
+                : 'bg-slate-950 text-white font-bold shadow-[0_14px_35px_rgba(15,23,42,0.16)]'
+            }`}
+          >
+            {formatMessage(msg.parts)}
           </div>
-        </div>
+        </motion.div>
       ))}
       <div ref={chatEndRef} />
     </div>
