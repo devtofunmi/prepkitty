@@ -1,121 +1,236 @@
 
-import { Mic, Brain, PenLine, TrendingUp, CheckCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+
+/**
+ * FEATURE DIAGRAMS (Code-based SVG Abstract Elements)
+ */
+
+const VoiceChatDiagram = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <div className="absolute inset-0 bg-blue-500/5 rounded-full blur-3xl animate-pulse" />
+    <svg width="240" height="120" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {[...Array(20)].map((_, i) => (
+        <motion.rect
+          key={i}
+          initial={{ height: 10 }}
+          animate={{ height: [10, 40 + Math.random() * 60, 10] }}
+          transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.05 }}
+          x={10 + i * 11}
+          y={60}
+          width="4"
+          height="100"
+          rx="2"
+          fill={i % 2 === 0 ? "#3b82f6" : "#bef264"}
+          className="origin-center"
+          style={{ transform: "translateY(-50%)" }}
+        />
+      ))}
+    </svg>
+  </div>
+);
+
+const InterviewerDiagram = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <motion.circle 
+        cx="100" cy="100" r="40" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5 5"
+        animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.circle 
+        cx="100" cy="100" r="70" stroke="#bef264" strokeWidth="1" strokeDasharray="10 10"
+        animate={{ rotate: -360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+      />
+      <circle cx="100" cy="100" r="20" fill="#0f172a" />
+      {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+        <motion.circle
+          key={i}
+          cx={100 + Math.cos(angle * Math.PI / 180) * 70}
+          cy={100 + Math.sin(angle * Math.PI / 180) * 70}
+          r="6"
+          fill={i % 2 === 0 ? "#3b82f6" : "#bef264"}
+          animate={{ scale: [1, 1.3, 1] }}
+          transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+        />
+      ))}
+    </svg>
+  </div>
+);
+
+const FeedbackDiagram = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <div className="w-48 h-48 rounded-full border-4 border-dashed border-blue-200 flex items-center justify-center">
+       <motion.div 
+         animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
+         transition={{ duration: 3, repeat: Infinity }}
+         className="w-32 h-32 bg-blue-600 rounded-full flex items-center justify-center text-white"
+       >
+          <div className="flex gap-1">
+             <div className="w-1 h-8 bg-white/20" />
+             <div className="w-1 h-12 bg-white/50" />
+             <div className="w-1 h-6 bg-white/80" />
+          </div>
+       </motion.div>
+    </div>
+  </div>
+);
+
+const ProgressDiagram = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <motion.path
+        d="M20 160 L60 120 L100 140 L140 80 L180 100"
+        stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
+        initial={{ pathLength: 0 }}
+        whileInView={{ pathLength: 1 }}
+        transition={{ duration: 2 }}
+      />
+      <circle cx="180" cy="100" r="8" fill="#bef264" />
+      <motion.circle
+        cx="180" cy="100" r="15" stroke="#bef264" strokeWidth="2"
+        animate={{ scale: [1, 2], opacity: [1, 0] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      />
+    </svg>
+  </div>
+);
 
 const features = [
   {
-    icon: Mic,
     title: "Voice chat",
-    description: "Our realistic voice chat feels just like a real interview.",
-    linkText: "Realistic voice chat",
+    description: "Our realistic voice chat feels just like a real interview. Practice your tone, pacing, and confidence in a safe space.",
+    diagram: <VoiceChatDiagram />,
+    color: "bg-blue-600",
+    textColor: "text-lime-300",
+    buttonColor: "bg-lime-400 text-black"
   },
   {
-    icon: Brain,
     title: "Powerful interviewer",
-    description: "Our AI interviewer will question you on everything from job-specific technicalities to items on your résumé.",
-    linkText: "Find holes in your CV",
+    description: "Our AI interviewer will question you on everything from job-specific technicalities to obscure items on your résumé.",
+    diagram: <InterviewerDiagram />,
+    color: "bg-black",
+    textColor: "text-blue-400",
+    buttonColor: "bg-blue-500 text-white"
   },
   {
-    icon: PenLine,
     title: "Constructive feedback",
-    description: "Get honest constructive feedback from our intelligent interview model.",
-    linkText: "Improve your technique",
+    description: "Get honest, objective, and constructive feedback from our intelligent models to refine your answers.",
+    diagram: <FeedbackDiagram />,
+    color: "bg-blue-500",
+    textColor: "text-white",
+    buttonColor: "bg-white text-blue-600"
   },
   {
-    icon: TrendingUp,
     title: "Get better",
-    description: "Work your way up from easy to hard mode mastering your interview technique.",
-    linkText: "Master each difficulty level",
-  },
+    description: "Work your way up from easy to hard mode, mastering each stage of your career transition.",
+    diagram: <ProgressDiagram />,
+    color: "bg-lime-400",
+    textColor: "text-neutral-900",
+    buttonColor: "bg-neutral-900 text-white"
+  }
+];
+
+const prompts = [
+  { industry: "Banking", text: "Explain how KYC and AML processes work in complex cross-border transactions.", light: "bg-blue-50 text-blue-700" },
+  { industry: "Tech", text: "How would you handle a production outage while being grilled by a CTO?", light: "bg-neutral-100 text-neutral-800" },
+  { industry: "Fintech", text: "Design a secure, scalable payment flow for a multi-tenant neobank.", light: "bg-lime-50 text-lime-700" },
+  { industry: "Legal", text: "Explain the implications of GDPR on non-EU based data processors.", light: "bg-indigo-50 text-indigo-700" },
 ];
 
 export const Features = () => {
   return (
-    <section id="features" className="px-6 py-20 bg-white max-w-7xl mx-auto" data-aos="fade-up">
-      <div className="text-center">
-        <span className=" py-1 px-2 text-sm rounded-full mt-10 border border-gray-300 inline-block text-gray-700">
-          Get the job you deserve!
-        </span>
-        <h2 className="text-4xl font-extrabold  text-gray-900">Practice makes perfect</h2>
-        <p className="max-w-2xl mx-auto text-gray-600 ">
-          Prepkitty is designed to be as simple and effective as possible. Here’s how it works:
-        </p>
-      </div>
+    <section id="features" className="relative">
+      {features.map((feature, idx) => (
+        <div
+          key={idx}
+          className={`py-24 md:py-40 ${feature.color} relative overflow-hidden`}
+        >
+          <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
-      <div className="grid md:grid-cols-2 gap-8 mt-12">
-        <div className="p-8 rounded-xl bg-blue-400 text-white flex flex-col justify-between min-h-[450px]">
-          <p className="text-xl font-semibold mb-6">For your realistic practice and in-depth analysis of your performance, anytime.</p>
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className={`flex flex-col ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 md:gap-24 items-center`}>
 
-          <div className="flex flex-col gap-6">
-            <div className="bg-white/10 p-4 rounded-lg flex items-start">
-              <Mic size={24} className="text-white mt-1 mr-4 shrink-0" />
-              <div>
-                <h3 className="text-xl font-bold mb-1">{features[0].title}</h3>
-                <p className="text-sm text-gray-200">{features[0].description}</p>
-                <p className="text-sm font-medium underline hover:no-underline">{features[0].linkText}</p>
-              </div>
-            </div>
-            <div className="bg-white/10 p-4 rounded-lg flex items-start">
-              <Brain size={24} className="text-white mt-1 mr-4 shrink-0" />
-              <div>
-                <h3 className="text-xl font-bold mb-1">{features[1].title}</h3>
-                <p className="text-sm text-gray-200">{features[1].description}</p>
-                <p className="text-sm font-medium underline hover:no-underline">{features[1].linkText}</p>
-              </div>
+              {/* Text block */}
+              <motion.div
+                initial={{ opacity: 0, x: idx % 2 === 0 ? -40 : 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="w-full lg:w-1/2 text-center lg:text-left"
+              >
+                <div className={`text-5xl md:text-8xl font-black mb-10 leading-[0.85] flex flex-col tracking-tighter ${feature.textColor}`}>
+                  <span>Real</span>
+                  <span className="italic">{feature.title}</span>
+                </div>
+
+                <p className={`text-lg md:text-2xl font-medium mb-12 max-w-lg mx-auto lg:mx-0 leading-relaxed ${feature.color.includes('lime') ? 'text-black/70' : 'text-white/80'}`}>
+                  {feature.description}
+                </p>
+
+                <Link href="/signup" className="mx-auto lg:mx-0">
+                  <button className={`px-10 py-5 rounded-full font-black hover:scale-105 active:scale-95 transition-all text-lg shadow-2xl flex items-center justify-center gap-3 ${feature.buttonColor}`}>
+                    Get started free <ArrowRight size={22} />
+                  </button>
+                </Link>
+              </motion.div>
+
+              {/* Diagram block */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1 }}
+                className="w-full lg:w-1/2 min-h-[300px] md:min-h-[400px] flex items-center justify-center"
+              >
+                 <div className="relative w-full max-w-md aspect-square bg-white/5 backdrop-blur-3xl rounded-[3rem] border border-white/10 flex items-center justify-center p-12">
+                     {feature.diagram}
+                 </div>
+              </motion.div>
+
             </div>
           </div>
         </div>
+      ))}
 
-        <div className="p-8 bg-gray-50 rounded-xl border border-gray-200 flex flex-col justify-between min-h-[450px]">
-          <div className="p-2 rounded-full bg-gray-200 w-fit">
-            <CheckCircle size={20} className="text-gray-700" />
-          </div>
-          <div className="space-y-6">
-            <div className="flex items-start">
-              <PenLine size={24} className="text-blue-400 mr-4 mt-1 shrink-0" />
-              <div>
-                <h3 className="text-xl font-semibold mb-1">{features[2].title}</h3>
-                <p className="text-gray-600 text-base">{features[2].description}</p>
-                <a href="#features" className="text-blue-400 hover:text-blue-500 font-medium text-sm">{features[2].linkText}</a>
-              </div>
+      {/* Prompts Section - Removed OVERFLOW-HIDDEN to let sticky work */}
+      <div className="py-24 md:py-40 bg-slate-50 relative">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)", backgroundSize: "80px 80px" }} />
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 items-start">
+
+            <div className="lg:w-[38%] shrink-0 lg:sticky lg:top-40 h-fit">
+              <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9] mb-8">
+                Sample<br />
+                <span className="text-slate-300 italic">prompts.</span>
+              </h1>
+              <p className="text-slate-500 text-lg md:text-xl leading-relaxed max-w-sm font-medium">
+                We use real-world industry intelligence to push your limits and prepare you for anything.
+              </p>
             </div>
-            <div className="flex items-start">
-              <TrendingUp size={24} className="text-blue-400 mr-4 mt-1 shrink-0" />
-              <div>
-                <h3 className="text-xl font-semibold mb-1">{features[3].title}</h3>
-                <p className="text-gray-600 text-base">{features[3].description}</p>
-                <a href="#features" className="text-blue-400 hover:text-blue-500 font-medium text-sm">{features[3].linkText}</a>
-              </div>
+
+            <div className="flex-1 flex flex-col gap-6 w-full">
+              {prompts.map((p, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="group bg-white rounded-3xl border border-slate-200 p-8 md:p-10 hover:shadow-2xl transition-all"
+                >
+                   <div className="flex items-center justify-between mb-6">
+                      <span className={`inline-block px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest ${p.light}`}>
+                        {p.industry}
+                      </span>
+                   </div>
+                   <p className="text-slate-900 text-xl md:text-2xl font-bold leading-snug">
+                     &quot;{p.text}&quot;
+                   </p>
+                </motion.div>
+              ))}
             </div>
-            {/* Sample interview prompts for common industries */}
-            <div className="mt-6 bg-white p-4 rounded-lg border">
-              <h4 className="text-lg font-semibold mb-3">Sample interview prompts</h4>
-              <ul className="text-sm text-gray-700 space-y-2">
-                <li>
-                  <strong>Banks:</strong> &quot;Explain how KYC and AML processes work in line with international financial regulations.&quot;
-                </li>
-                <li>
-                  <strong>Telecoms:</strong> &quot;Describe a network handover process and steps to troubleshoot frequent dropped calls on a mobile network.&quot;
-                </li>
-                <li>
-                  <strong>Fintech/Payments:</strong> &quot;How would you design a secure payment flow for cross-border transfers and mobile wallet integrations?&quot;
-                </li>
-                <li>
-                  <strong>Oil &amp; Gas / Energy:</strong> &quot;Explain basic HSE (Health, Safety & Environment) considerations for offshore operations.&quot;
-                </li>
-                <li>
-                  <strong>Product / PM roles:</strong> &quot;How would you prioritize features for a global product being launched across multiple markets?&quot;
-                </li>
-                <li>
-                  <strong>Agriculture:</strong> &quot;Discuss the major challenges and opportunities in precision farming and sustainable agriculture.&quot;
-                </li>
-                <li>
-                  <strong>Entertainment:</strong> &quot;As a production manager, how would you handle the logistics of a large-scale film shoot in a metropolitan area?&quot;
-                </li>
-                <li>
-                  <strong>E-commerce:</strong> &quot;What strategies would you use to increase customer trust and conversion in global online shopping platforms?&quot;
-                </li>
-              </ul>
-            </div>
+
           </div>
         </div>
       </div>
