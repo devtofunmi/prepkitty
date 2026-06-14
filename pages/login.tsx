@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { signIn, getSession } from 'next-auth/react';
+import { signIn, getSession, useSession } from 'next-auth/react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loader2, Eye, EyeOff, CheckCircle2, ArrowRight } from 'lucide-react';
@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isCredentialsLoading, setIsCredentialsLoading] = useState(false);
   const router = useRouter();
+  const { status } = useSession();
 
   useEffect(() => {
     const { email: emailFromQuery, verified, error: queryError } = router.query;
@@ -26,6 +27,20 @@ export default function LoginPage() {
       toast.error(queryError);
     }
   }, [router.query]);
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+
+    router.replace('/dashboard');
+  }, [router, status]);
+
+  if (status === 'loading' || status === 'authenticated') {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

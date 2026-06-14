@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ToastContainer, toast } from 'react-toastify';
@@ -8,6 +8,7 @@ import { Loader2, Eye, EyeOff, CheckCircle2, ArrowRight } from 'lucide-react';
 import zxcvbn from 'zxcvbn';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -16,8 +17,23 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isCredentialsLoading, setIsCredentialsLoading] = useState(false);
   const router = useRouter();
+  const { status } = useSession();
 
   const passwordStrength = password ? zxcvbn(password).score : 0;
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+
+    router.replace('/dashboard');
+  }, [router, status]);
+
+  if (status === 'loading' || status === 'authenticated') {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +65,7 @@ export default function SignupPage() {
       }
 
       router.push('/check-email');
-    } catch (error) {
+    } catch {
       toast.error('An unexpected error occurred.');
     } finally {
       setIsCredentialsLoading(false);

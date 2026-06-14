@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 type CVData = {
   name: string;
@@ -35,6 +35,182 @@ const inputClass =
   'w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50';
 
 const textareaClass = `${inputClass} min-h-[120px] resize-y leading-relaxed`;
+
+const monthOptions = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+const currentYear = new Date().getFullYear();
+const yearOptions = Array.from({ length: 65 }, (_, index) => String(currentYear + 5 - index));
+
+const parseMonthYear = (value: string) => {
+  if (!value) {
+    return { month: '', year: '', isPresent: false };
+  }
+
+  if (value.toLowerCase() === 'present') {
+    return { month: '', year: '', isPresent: true };
+  }
+
+  const isoMatch = value.match(/^(\d{4})-(\d{2})/);
+  if (isoMatch) {
+    return {
+      month: monthOptions[Math.max(0, Number(isoMatch[2]) - 1)] || '',
+      year: isoMatch[1],
+      isPresent: false,
+    };
+  }
+
+  const year = value.match(/\b(19|20)\d{2}\b/)?.[0] || '';
+  const lowerValue = value.toLowerCase();
+  const month = monthOptions.find((item) => lowerValue.includes(item.toLowerCase())) || '';
+
+  return { month, year, isPresent: false };
+};
+
+const formatMonthYear = (month: string, year: string) => {
+  if (month && year) return `${month} ${year}`;
+  if (year) return year;
+  return '';
+};
+
+const DateDropdown: React.FC<{
+  label: string;
+  value: string;
+  placeholder: string;
+  options: string[];
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}> = ({ label, value, placeholder, options, onChange, disabled = false }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div
+      className="relative"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setIsOpen(false);
+        }
+      }}
+    >
+      <button
+        type="button"
+        aria-label={label}
+        aria-expanded={isOpen}
+        disabled={disabled}
+        onClick={() => setIsOpen((current) => !current)}
+        className={`flex h-12 w-full items-center justify-between rounded-2xl border px-4 text-left text-sm font-black transition ${
+          disabled
+            ? 'cursor-not-allowed border-slate-100 bg-slate-100 text-slate-300'
+            : isOpen
+              ? 'border-blue-300 bg-white text-slate-900 ring-4 ring-blue-50'
+              : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-blue-200 hover:bg-white'
+        }`}
+      >
+        <span className={value ? 'text-slate-900' : 'text-slate-400'}>{value || placeholder}</span>
+        <span className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}>v</span>
+      </button>
+
+      {isOpen && !disabled && (
+        <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl shadow-slate-900/10">
+          <div className="max-h-56 overflow-y-auto p-2">
+            <button
+              type="button"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                onChange('');
+                setIsOpen(false);
+              }}
+              className="w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-slate-400 hover:bg-slate-50"
+            >
+              {placeholder}
+            </button>
+            {options.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  onChange(option);
+                  setIsOpen(false);
+                }}
+                className={`w-full rounded-xl px-3 py-2 text-left text-sm font-bold transition ${
+                  value === option ? 'bg-blue-600 text-white' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MonthYearField: React.FC<{
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  allowPresent?: boolean;
+}> = ({ label, value, onChange, allowPresent = false }) => {
+  const parsed = parseMonthYear(value);
+
+  const updateDate = (nextMonth: string, nextYear: string) => {
+    onChange(formatMonthYear(nextMonth, nextYear));
+  };
+
+  return (
+    <div className="min-w-0">
+      <div className="mb-2 flex min-h-7 items-center justify-between gap-3">
+        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</span>
+        {allowPresent ? (
+          <button
+            type="button"
+            onClick={() => onChange(parsed.isPresent ? '' : 'Present')}
+            className={`rounded-full px-3 py-1 text-[10px] font-black ${
+              parsed.isPresent ? 'bg-blue-600 text-white' : 'bg-white text-slate-400'
+            }`}
+          >
+            Current
+          </button>
+        ) : (
+          <span className="invisible rounded-full px-3 py-1 text-[10px] font-black">Current</span>
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <DateDropdown
+          label={`${label} month`}
+          value={parsed.isPresent ? '' : parsed.month}
+          placeholder="Month"
+          options={monthOptions}
+          onChange={(nextMonth) => updateDate(nextMonth, parsed.year)}
+          disabled={parsed.isPresent}
+        />
+        <DateDropdown
+          label={`${label} year`}
+          value={parsed.isPresent ? '' : parsed.year}
+          placeholder="Year"
+          options={yearOptions}
+          onChange={(nextYear) => updateDate(parsed.month, nextYear)}
+          disabled={parsed.isPresent}
+        />
+      </div>
+    </div>
+  );
+};
 
 export const CVTemplate: React.FC<CVTemplateProps> = ({
   data,
@@ -84,18 +260,18 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
   };
 
   return (
-    <div className="mx-auto max-w-4xl rounded-[2rem] border border-slate-200 bg-white p-8 font-sans text-slate-900 shadow-sm md:p-10">
+    <div className="mx-auto w-full max-w-4xl rounded-[2rem] border border-slate-200 bg-white p-5 font-sans text-slate-900 shadow-sm sm:p-8 md:p-10">
       <header className="border-b border-slate-200 pb-8">
         {isEditing ? (
           <input
             type="text"
             value={data.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-3xl font-black tracking-tight text-slate-900 outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
+            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-2xl font-black tracking-tight text-slate-900 outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50 sm:text-3xl"
             placeholder="Your name"
           />
         ) : (
-          <h1 className="text-4xl font-black tracking-tight text-slate-950">{data.name}</h1>
+          <h1 className="break-words text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{data.name}</h1>
         )}
 
         {isEditing ? (
@@ -107,7 +283,7 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
             placeholder="Job title"
           />
         ) : (
-          <p className="mt-3 text-xl font-black text-blue-600">{data.jobTitle}</p>
+          <p className="mt-3 break-words text-lg font-black text-blue-600 sm:text-xl">{data.jobTitle}</p>
         )}
 
         {isEditing ? (
@@ -202,18 +378,17 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                       onChange={(e) => handleHistoryChange(index, 'location', e.target.value)}
                       className={inputClass}
                     />
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        className={inputClass}
-                        type="date"
+                    <div className="grid grid-cols-1 gap-3 md:col-span-2 md:grid-cols-2">
+                      <MonthYearField
+                        label="Start date"
                         value={job.startDate}
-                        onChange={(e) => handleHistoryChange(index, 'startDate', e.target.value)}
+                        onChange={(value) => handleHistoryChange(index, 'startDate', value)}
                       />
-                      <input
-                        className={inputClass}
-                        type="date"
+                      <MonthYearField
+                        label="End date"
                         value={job.endDate}
-                        onChange={(e) => handleHistoryChange(index, 'endDate', e.target.value)}
+                        onChange={(value) => handleHistoryChange(index, 'endDate', value)}
+                        allowPresent
                       />
                     </div>
                   </div>
@@ -241,9 +416,11 @@ export const CVTemplate: React.FC<CVTemplateProps> = ({
                       <h3 className="text-lg font-black text-slate-950">{job.company}</h3>
                       <p className="font-bold text-slate-700">{job.jobTitle}</p>
                     </div>
-                    <p className="text-sm font-bold text-slate-400">
-                      {job.startDate} - {job.endDate}
-                    </p>
+                    {(job.startDate || job.endDate) && (
+                      <p className="text-sm font-bold text-slate-400">
+                        {job.startDate || 'Start'} - {job.endDate || 'Now'}
+                      </p>
+                    )}
                   </div>
                   {job.location && <p className="mt-1 text-sm font-medium text-slate-400">{job.location}</p>}
                   <p className="mt-4 leading-relaxed text-slate-700">{job.description}</p>

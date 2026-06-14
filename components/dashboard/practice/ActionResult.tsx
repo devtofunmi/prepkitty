@@ -83,22 +83,22 @@ const ActionResult: React.FC<ActionResultProps> = ({
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-          <div className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
-            <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Score</p>
-            <p className="text-5xl font-black tracking-tighter text-slate-900 tabular-nums">
-              {score}<span className="text-xl font-medium text-slate-300">/{total}</span>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 lg:grid-cols-1">
+          <div className="min-w-0 rounded-[1.35rem] border border-slate-100 bg-white p-3 shadow-sm sm:rounded-[2rem] sm:p-6">
+            <p className="mb-2 truncate text-[9px] font-black uppercase tracking-widest text-slate-400 italic sm:mb-3 sm:text-[10px]">Score</p>
+            <p className="text-2xl font-black tracking-tighter text-slate-900 tabular-nums sm:text-5xl">
+              {score}<span className="text-sm font-medium text-slate-300 sm:text-xl">/{total}</span>
             </p>
           </div>
 
-          <div className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
-            <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Accuracy</p>
-            <p className="text-5xl font-black tracking-tighter text-blue-600 tabular-nums">{accuracy}%</p>
+          <div className="min-w-0 rounded-[1.35rem] border border-slate-100 bg-white p-3 shadow-sm sm:rounded-[2rem] sm:p-6">
+            <p className="mb-2 truncate text-[9px] font-black uppercase tracking-widest text-slate-400 italic sm:mb-3 sm:text-[10px]">Accuracy</p>
+            <p className="text-2xl font-black tracking-tighter text-blue-600 tabular-nums sm:text-5xl">{accuracy}%</p>
           </div>
 
-          <div className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
-            <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Missed</p>
-            <p className="text-5xl font-black tracking-tighter text-slate-900 tabular-nums">{missedCount}</p>
+          <div className="min-w-0 rounded-[1.35rem] border border-slate-100 bg-white p-3 shadow-sm sm:rounded-[2rem] sm:p-6">
+            <p className="mb-2 truncate text-[9px] font-black uppercase tracking-widest text-slate-400 italic sm:mb-3 sm:text-[10px]">Missed</p>
+            <p className="text-2xl font-black tracking-tighter text-slate-900 tabular-nums sm:text-5xl">{missedCount}</p>
           </div>
         </div>
       </div>

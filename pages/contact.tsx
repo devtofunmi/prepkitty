@@ -12,7 +12,7 @@ export default function Contact() {
       <Header />
       <main className="max-w-7xl mx-auto px-6 pt-40 pb-24">
         <div className="grid lg:grid-cols-2 gap-16 items-start">
-           <motion.div
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
           >
@@ -27,9 +27,9 @@ export default function Contact() {
 
           <div className="space-y-12">
             <section className="bg-white p-10 rounded-3xl border border-slate-200">
-               <h3 className="text-slate-900 font-black text-xl mb-4">Email</h3>
-               <p className="text-slate-500 text-lg mb-8">Reach out for any feedback or questions regarding the platform.</p>
-               <a href="mailto:hello@prepkitty.com" className="text-blue-600 text-2xl font-bold hover:underline">hello@prepkitty.com</a>
+              <h3 className="text-slate-900 font-black text-xl mb-4">Email</h3>
+              <p className="text-slate-500 text-lg mb-8">Reach out for any feedback or questions regarding the platform.</p>
+              <a href="mailto:prepkitty729@gmail.com" className="text-blue-600 text-2xl font-bold hover:underline">prepkitty729@gmail.com</a>
             </section>
           </div>
         </div>

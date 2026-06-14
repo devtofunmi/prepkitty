@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Bot, BrainCircuit, CheckCircle2, Loader2, MessageSquare, Mic2, Volume2 } from 'lucide-react';
+import { AlertCircle, ArrowRight, Bot, BrainCircuit, CheckCircle2, Loader2, MessageSquare, Mic2, Volume2, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import PracticeModeSwitcher from './PracticeModeSwitcher';
@@ -95,6 +95,7 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
   const [wrongAnswers, setWrongAnswers] = useState<WrongAnswer[]>([]);
   const [chatSummary, setChatSummary] = useState('');
   const [isSummarizing, setIsSummarizing] = useState(false);
+  const [practiceError, setPracticeError] = useState('');
   // Local state for toggling AI voice inside the chat modal. Initialized from prop.
   const [enableTTSState, setEnableTTSState] = useState<boolean>(enableTTS);
 
@@ -102,6 +103,37 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
   const hasStarted =
     (practiceMode === 'chat' && conversationHistory.length > 0) ||
     (practiceMode === 'quiz' && (quizData !== null || quizCompleted));
+
+  const getFriendlyAIError = (status?: number, apiMessage?: string) => {
+    const normalizedMessage = apiMessage?.toLowerCase() || '';
+
+    if (
+      status === 429 ||
+      normalizedMessage.includes('quota') ||
+      normalizedMessage.includes('rate limit') ||
+      normalizedMessage.includes('exceeded')
+    ) {
+      return 'The AI usage limit has been reached for now. Please try again later.';
+    }
+
+    if (status && status >= 500) {
+      return 'The AI service is having trouble right now. Please try again in a few minutes.';
+    }
+
+    return 'The AI could not respond right now. Please try again.';
+  };
+
+  const showPracticeError = (message: string) => {
+    setPracticeError(message);
+    return message;
+  };
+
+  const handleAIResponseError = async (response: Response) => {
+    const errorData = await response.json().catch(() => ({ message: '' }));
+    const message = getFriendlyAIError(response.status, errorData?.message);
+    console.error('AI request failed:', errorData);
+    return showPracticeError(message);
+  };
 
 
   useEffect(() => {
@@ -114,6 +146,7 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
     setSelectedOption(null);
     setWrongAnswers([]);
     setChatSummary('');
+    setPracticeError('');
     if (enableTTSState) stopSpeaking(); // Stop TTS when switching mode (only if TTS enabled)
   }, [practiceMode, enableTTSState]);
 
@@ -170,6 +203,7 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
 
   const getChatSummary = async (history: Array<{ role: string; parts: string }>) => {
     setIsSummarizing(true);
+    setPracticeError('');
     try {
       const payload = {
         jobTitle: user.practiceProfile?.jobTitle || '',
@@ -192,12 +226,12 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
         const data = await response.json();
         setChatSummary(data.response);
       } else {
-        const errorData = await response.json();
-        console.error('Failed to get chat summary:', errorData);
-        toast.error('Failed to get chat summary.');
+        const message = await handleAIResponseError(response);
+        setChatSummary(message);
       }
     } catch {
-      toast.error('Error getting chat summary.');
+      const message = showPracticeError('The AI could not create your review. Please try again later.');
+      setChatSummary(message);
     } finally {
       setIsSummarizing(false);
       setChatCompleted(true);
@@ -206,6 +240,7 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
 
   const startInterview = async () => {
     setIsGenerating(true);
+    setPracticeError('');
     setConversationHistory([]);
     setQuizData(null);
     setSelectedOption(null);
@@ -249,14 +284,15 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
             setQuizData(parsedQuiz);
           } else {
             console.error('Failed to parse quiz response:', data.response);
+            showPracticeError('The AI sent a quiz question we could not read. Please try again.');
           }
         }
       } else {
-        const errorData = await response.json();
-        console.error('Error from Gemini API:', errorData);
+        await handleAIResponseError(response);
       }
     } catch (err) {
       console.error('Network error:', err);
+      showPracticeError('The AI could not connect. Please check your connection and try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -314,6 +350,7 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
     if (!selectedOption && practiceMode === 'quiz') return;
 
     setIsGenerating(true);
+    setPracticeError('');
     let updatedHistory = [...conversationHistory];
     let currentResponse = '';
 
@@ -418,15 +455,16 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
               }, 0);
             } else {
               console.error('Failed to parse quiz response:', data.response);
+              showPracticeError('The AI sent a quiz question we could not read. Please try again.');
             }
           }
         }
       } else {
-        const errorData = await response.json();
-        console.error('Error from Gemini API:', errorData);
+        await handleAIResponseError(response);
       }
     } catch (error) {
       console.error('Network error:', error);
+      showPracticeError('The AI could not connect. Please check your connection and try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -620,6 +658,43 @@ const MainContent: React.FC<MainContentProps> = ({ user, enableTTS = true }) => 
           handleMicClick={handleMicClick}
           sendUserResponse={sendUserResponse}
         />
+      )}
+
+      {practiceError && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/40 px-6 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="relative w-full max-w-md rounded-[2rem] border border-red-100 bg-white p-8 text-left shadow-2xl shadow-slate-900/20"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="practice-error-title"
+          >
+            <button
+              type="button"
+              onClick={() => setPracticeError('')}
+              className="absolute right-5 top-5 rounded-full bg-slate-50 p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900"
+              aria-label="Close error"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+              <AlertCircle size={26} />
+            </div>
+            <h3 id="practice-error-title" className="mb-3 text-2xl font-black tracking-tight text-slate-900">
+              Something went wrong
+            </h3>
+            <p className="text-sm font-medium leading-relaxed text-slate-500">{practiceError}</p>
+            <button
+              type="button"
+              onClick={() => setPracticeError('')}
+              className="mt-8 w-full rounded-full bg-slate-900 px-6 py-4 text-sm font-black text-white transition hover:bg-slate-800 active:scale-95"
+            >
+              Got it
+            </button>
+          </motion.div>
+        </div>
       )}
     </div>
   );

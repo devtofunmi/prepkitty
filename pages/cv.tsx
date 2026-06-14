@@ -293,8 +293,8 @@ export default function CVPage({ cv: initialCv }: InferGetServerSidePropsType<ty
               </span>
             </div>
 
-            <div className="overflow-x-auto rounded-[2rem]">
-              <div ref={cvRef} className="min-w-[720px] md:min-w-0">
+            <div className="overflow-hidden rounded-[2rem]">
+              <div ref={cvRef}>
                 <CVTemplate data={cv} isEditing={isEditing} onDataChange={handleDataChange} />
               </div>
             </div>
