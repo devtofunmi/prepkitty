@@ -179,7 +179,7 @@ export default function Dashboard() {
         <section className="bg-slate-50 p-10 rounded-[3rem] border border-slate-100">
             <h4 className="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-4 italic">Professional Tip</h4>
             <p className="text-slate-500 text-lg italic font-medium leading-relaxed max-w-3xl">
-                "Speak clearly and pause for 2 seconds after each major point. It projects internal calm and dominance in technical discussions."
+                &quot;Speak clearly and pause for 2 seconds after each major point. It projects internal calm and dominance in technical discussions.&quot;
             </p>
         </section>
 

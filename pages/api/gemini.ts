@@ -105,10 +105,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const response = await result.response;
     const text = response.text();
     res.status(200).json({ response: text });
-  } catch (error: any) {
-    console.error('GENIMI API ERROR DETAILS:', error);
-    const status = error.status || 500;
-    const message = error.message || 'Error generating content from AI.';
+  } catch (error) {
+    console.error('GEMINI API ERROR DETAILS:', error);
+    const err = error as { status?: number; message?: string };
+    const status = err.status || 500;
+    const message = err.message || 'Error generating content from AI.';
     res.status(status).json({ message, details: error });
   }
 }
