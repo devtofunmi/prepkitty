@@ -78,10 +78,11 @@ export const Header = () => {
 
           {/* Mobile Toggle */}
           <button
-            className="md:hidden p-2 text-white/70 hover:text-white"
+            className="md:hidden p-2 text-slate-900 hover:text-blue-600 transition-colors z-50"
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            aria-label="Toggle navigation"
           >
-            {mobileNavOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileNavOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </nav>
       </div>
