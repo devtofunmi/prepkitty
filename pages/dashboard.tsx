@@ -8,6 +8,7 @@ import { Loader2, ArrowRight, Trophy, Clock, Target } from 'lucide-react';
 import Layout from '../components/dashboard/Layout';
 import Link from 'next/link';
 import DashboardAnalytics from '@/components/dashboard/DashboardAnalytics';
+import LoadingScreen from '@/components/LoadingScreen';
 import { motion } from 'framer-motion';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -59,11 +60,7 @@ export default function Dashboard() {
   }, [status, router, data]);
 
   if (status === 'loading' || !data) {
-    return (
-      <div className="flex justify-center bg-white items-center min-h-screen">
-        <Loader2 className="animate-spin h-10 w-10 text-blue-600" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (error) {

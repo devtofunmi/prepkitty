@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import PricingModal from "../dashboard/practice/PricingModal";
-import { Menu, Loader2 } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import LoadingScreen from "../LoadingScreen";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -24,11 +25,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 
   if (status === "loading" || (status === "authenticated" && !data)) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <Loader2 className="animate-spin h-10 w-10 text-blue-400" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   const { user } = data || {};

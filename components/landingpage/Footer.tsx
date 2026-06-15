@@ -32,8 +32,8 @@ export const Footer = () => {
             <ul className="space-y-4">
               {[
                 { name: 'About', href: '/about' },
-                { name: 'Privacy', href: '/privacy' },
-                { name: 'Terms', href: '/terms' },
+                { name: 'Privacy Policy', href: '/privacy' },
+                { name: 'Terms of Service', href: '/terms' },
                 { name: 'Contact', href: '/contact' }
               ].map((link) => (
                 <li key={link.name}>
@@ -52,8 +52,8 @@ export const Footer = () => {
             <p className="text-xs text-slate-400 mt-1 italic">Practice sessions are confidential and securely stored.</p>
           </div>
           <div className="flex gap-8">
-            <a href="#" className="text-xs text-slate-400 hover:text-blue-600 transition-colors uppercase tracking-widest font-black">Privacy Policy</a>
-            <a href="#" className="text-xs text-slate-400 hover:text-blue-600 transition-colors uppercase tracking-widest font-black">Terms of Service</a>
+            <NextLink href="/privacy" className="text-xs text-slate-400 hover:text-blue-600 transition-colors uppercase tracking-widest font-black">Privacy Policy</NextLink>
+            <NextLink href="/terms" className="text-xs text-slate-400 hover:text-blue-600 transition-colors uppercase tracking-widest font-black">Terms of Service</NextLink>
           </div>
         </div>
       </div>
